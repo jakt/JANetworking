@@ -15,28 +15,50 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
+        ///////////////////////////////////////////////////////////////////////////
         // USAGE
-        JANetworking.loadJSON(Post.all) { data, error in
+        ///////////////////////////////////////////////////////////////////////////
+        
+        // Get all posts
+        let headers = ["Authorization": "SomeTokenValue"] // Add header example
+        JANetworking.loadJSON(Post.all(headers)) { data, error in
             if let err = error {
-                print("ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
-                print("ERROR: \(err.errorType.errorMessage())")
+                print("`Post.all` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
+                print("`Post.all` - ERROR: \(err.errorType.errorMessage())")
             }else{
                 if let data = data {
-                    print("SUCCESS: \(data)")
+                    print("`Post.all` - SUCCESS: \(data)")
                 }
             }
         }
         
-        JANetworking.loadJSON(Post.submit) { data, error in
+        // Create a Post object
+        var post = Post(id: 100, userName: "Enrique W", title: "My Title", body: "Some Message Here.")
+        JANetworking.loadJSON(post.submit(headers)) { data, error in
             if let err = error {
-                print("ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
-                print("ERROR: \(err.errorType.errorMessage())")
+                print("`Post.submit` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
+                print("`Post.submit` - ERROR: \(err.errorType.errorMessage())")
             }else{
                 if let data = data {
-                    print("SUCCESS: \(data)")
+                    print("`Post.submit` - SUCCESS: \(data)")
                 }
             }
         }
+        
+        // Update a post
+        // ERROR endpoint, should return 404. I set it this way to test
+        post.title = "Random"
+        JANetworking.loadJSON(post.update(headers)) { data, error in
+            if let err = error {
+                print("`Post.update` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
+                print("`Post.update` - ERROR: \(err.errorType.errorMessage())")
+            }else{
+                if let data = data {
+                    print("`Post.update` - SUCCESS: \(data)")
+                }
+            }
+        }
+
     }
 
     override func didReceiveMemoryWarning() {

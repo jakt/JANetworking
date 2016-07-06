@@ -14,8 +14,8 @@ let baseUrl = "http://demo3646012.mockable.io"
 struct Post {
     let id: Int
     let userName: String
-    let title: String
-    let body: String
+    var title: String
+    var body: String
 }
 
 extension Post {
@@ -31,21 +31,39 @@ extension Post {
         self.body = body
     }
     
-    static let postUrl = NSURL(string: baseUrl + "/posts")!
     
     // Get all post
-    static let headers = ["Authorization":"myTokenValue"]
-    static let all = JANetworkingResource<[Post]>(method: .GET, url: postUrl, headers: headers, params: nil, parseJSON: { json in
-        guard let dictionaries = json as? [JSONDictionary] else { return nil }
-        return dictionaries.flatMap(Post.init)
-    })
+    static func all(headers: [String: String]?) -> JANetworkingResource<[Post]>{
+        let url = NSURL(string: baseUrl + "/posts")!
+        return JANetworkingResource(method: .GET, url: url, headers: headers, params: nil, parseJSON: { json in
+            guard let dictionaries = json as? [JSONDictionary] else { return nil }
+            return dictionaries.flatMap(Post.init)
+        })
+    }
     
     // Submit a post
-    static let params = ["title": "I am Cool",
-                         "body": "Some text goes here yes",
-                         "user_name": "Matt"]
-    static let submit = JANetworkingResource<Post>(method: .POST, url: postUrl, headers: nil, params: params, parseJSON: { json in
-        guard let dictionary = json as? JSONDictionary else { return nil }
-        return Post(dictionary: dictionary)
-    })
+    func submit(headers: [String: String]?) -> JANetworkingResource<Post>{
+        let url = NSURL(string: baseUrl + "/posts")!
+        let params:JSONDictionary = ["id": id,
+                                     "userName": userName,
+                                     "title": title,
+                                     "body": body]
+        return JANetworkingResource(method: .POST, url: url, headers: headers, params: params, parseJSON: { json in
+            guard let dictionary = json as? JSONDictionary else { return nil }
+            return Post(dictionary: dictionary)
+        })
+    }
+    
+    // Update a post
+    func update(headers: [String: String]?) -> JANetworkingResource<Post>{
+        let url = NSURL(string: baseUrl + "/posts/\(id)")!
+        let params:JSONDictionary = ["id": id,
+                                     "userName": userName,
+                                     "title": title,
+                                     "body": body]
+        return JANetworkingResource<Post>(method: .PUT, url: url, headers: headers, params: params, parseJSON: { json in
+            guard let dictionary = json as? JSONDictionary else { return nil }
+            return Post(dictionary: dictionary)
+        })
+    }
 }
