@@ -32,13 +32,13 @@ public final class JANetworking {
         NSURLSession.sharedSession().dataTaskWithRequest(request) { data, response, error in
             // error is nil when failed request. Not nil when the request went through. However even if the request went through, the reponse can be of status code error 400 up or 500 up
             if let errorObj = error {
-                let JAError = JANetworkingError(error: errorObj)
-                completion(nil, error: JAError)
+                let networkError = JANetworkingError(error: errorObj)
+                completion(nil, error: networkError)
             }else{
                 // Success request, HOWEVER the reponse can be with status code 400 and up
                 let result = data.flatMap(resource.parse)
-                let JAError = JANetworkingError(response: response)
-                completion(result, error: JAError)
+                let networkError = JANetworkingError(response: response)
+                completion(result, error: networkError)
             }
             
         }.resume()

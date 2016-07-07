@@ -116,13 +116,15 @@ public struct JANetworkingError {
 extension JANetworkingError {
     // Error init. An NSError object exist
     public init(error: NSError) {
+        // TODO: Make sure to parse the NSError and know what the actual error is
         self.error = error
         self.errorType = .Unknown
     }
     
     // Optional. Based on the response, it can still be an error depending on the status code
     public init?(response: NSURLResponse?) {
-        guard let response = response as? NSHTTPURLResponse where response.statusCode >= 400 && response.statusCode <= 600 else { // Client reponse error 400 and server response error 500
+        // TODO: Make sure to check if the server reponse is success with 200 code but also the result object could containt `{ success: false, message:"Some error message" }`
+        guard let response = response as? NSHTTPURLResponse where response.statusCode >= 200 && response.statusCode < 300 else {
             return nil
         }
         self.errorType = ErrorType(response: response)
