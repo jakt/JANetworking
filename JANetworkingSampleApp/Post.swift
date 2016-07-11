@@ -9,8 +9,6 @@
 import Foundation
 import JANetworking
 
-let baseUrl = "http://demo3646012.mockable.io"
-
 struct Post {
     let id: Int
     let userName: String
@@ -36,8 +34,8 @@ extension Post {
     static func all(headers: [String: String]?) -> JANetworkingResource<[Post]>{
         let url = NSURL(string: baseUrl + "/posts")!
         return JANetworkingResource(method: .GET, url: url, headers: headers, params: nil, parseJSON: { json in
-            guard let dictionaries = json as? [JSONDictionary] else { return nil }
-            return dictionaries.flatMap(Post.init)
+            guard let dictionaryArray = json as? [JSONDictionary] else { return nil }
+            return dictionaryArray.flatMap(Post.init)
         })
     }
     
@@ -61,7 +59,7 @@ extension Post {
                                      "userName": userName,
                                      "title": title,
                                      "body": body]
-        return JANetworkingResource<Post>(method: .PUT, url: url, headers: headers, params: params, parseJSON: { json in
+        return JANetworkingResource(method: .PUT, url: url, headers: headers, params: params, parseJSON: { json in
             guard let dictionary = json as? JSONDictionary else { return nil }
             return Post(dictionary: dictionary)
         })

@@ -92,7 +92,7 @@ Now we need to add the rest of the methods in the `Post extension` that we want 
     }
 ```
 ### JANetworking
-`JANetworking.loadJSON` takes in resource generic type and a completion block. 
+`JANetworking.loadJSON` takes in resource generic type and a completion block. Using `JANetworking.loadJSON` will automatically detect the **[JANetworkingError](#JANetworkingError)**  from our stack
 
 Finally on your `ViewController`. You can call:  
 #### Get All Post
@@ -101,7 +101,8 @@ let headers = ["Authorization": "SomeTokenValue"] // Add header example
 JANetworking.loadJSON(Post.all(headers)) { data, error in
     if let err = error {
         print("`Post.all` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
-        print("`Post.all` - ERROR: \(err.errorType.errorMessage())")
+        print("`Post.all` - ERROR: \(err.errorType.errorDescription())")
+        print("`Post.all` - ERROR: \(err.errorData)")
     }else{
         if let data = data {
             print("`Post.all` - SUCCESS: \(data)")
@@ -115,7 +116,8 @@ var post = Post(id: 100, userName: "Enrique W", title: "My Title", body: "Some M
 JANetworking.loadJSON(post.submit(headers)) { data, error in
     if let err = error {
         print("`Post.submit` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
-        print("`Post.submit` - ERROR: \(err.errorType.errorMessage())")
+        print("`Post.submit` - ERROR: \(err.errorType.errorDescription())")
+        print("`Post.submit` - ERROR: \(err.errorData)")
     }else{
         if let data = data {
             print("`Post.submit` - SUCCESS: \(data)")
@@ -123,4 +125,25 @@ JANetworking.loadJSON(post.submit(headers)) { data, error in
     }
 }
 ```
+### JANetworkingError
+There are 2 types of error: NSError, Response Error. You can access to the error data in the JANetworkingError object. `JANetworkingError.errorData`. Example:
+```
+if let err = error {
+    print("`Post.submit` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
+    print("`Post.submit` - ERROR: \(err.errorType.errorDescription())")
+    print("`Post.submit` - ERROR: \(err.errorData)")
+}
+```
+#### NSError
+- This error occurs when `dataTaskWithRequest` returns an NSError, which is unrelated to the reponse error. This means that the request has failed.
 
+#### Reponse Error
+ - This occurs when the `dataTaskWithRequest` returns success, However the reponse is within the range of status code ERROR (4xx or 5xx). Dependeding on the error the `error` field can vary. Usually it will be in this format: 
+```
+{
+    "error_type": "MethodNotAllowed",
+    "errors":[{
+         "message": "Method Get not allowed",
+    }]
+}
+```

@@ -16,6 +16,7 @@ public enum ErrorType {
     case BadRequest
     case Unauthorized
     case NotFound
+    case MethodNotAllowed
     
     case InternalServerError
     case BadGateway
@@ -35,6 +36,9 @@ public enum ErrorType {
             break
         case 404:
             self = .NotFound
+            break
+        case 405:
+            self = .MethodNotAllowed
             break
             
         // Server error message
@@ -68,6 +72,8 @@ public enum ErrorType {
             return "Access Denied"
         case .NotFound:
             return "Not Found"
+        case .MethodNotAllowed:
+            return "Method Not Allowed"
             
         // Server error
         case .InternalServerError:
@@ -81,7 +87,7 @@ public enum ErrorType {
         }
     }
     
-    public func errorMessage() -> String {
+    public func errorDescription() -> String {
         switch self {
         case .Unknown:
             return "Sorry. Unexpected error."
@@ -93,6 +99,8 @@ public enum ErrorType {
             return "Authentication is needed to get requested response. This is similar to 403, but in this case, authentication is possible."
         case .NotFound:
             return "Server can not find requested resource. This response code probably is most famous one due to its frequency to occur in web."
+        case .MethodNotAllowed:
+            return "The request method is known by the server but has been disabled and cannot be used. The two mandatory methods, GET and HEAD, must never be disabled and should not return this error code."
             
         // Server error
         case .InternalServerError:
@@ -111,6 +119,8 @@ public struct JANetworkingError {
     public let errorType: ErrorType
     public var error: NSError? = nil // Original object
     public var statusCode: Int? = nil
+    public var errorData: JSONDictionary? = nil
+
 }
 
 extension JANetworkingError {
@@ -122,12 +132,25 @@ extension JANetworkingError {
     }
     
     // Optional. Based on the response, it can still be an error depending on the status code
-    public init?(response: NSURLResponse?) {
-        // TODO: Make sure to check if the server reponse is success with 200 code but also the result object could containt `{ success: false, message:"Some error message" }`
-        guard let response = response as? NSHTTPURLResponse where response.statusCode >= 200 && response.statusCode < 300 else {
+    public init?(responseError: NSURLResponse?, serverError: JSONDictionary?) {
+        // Make sure reponse exist and the status code is between the 2xx range
+        guard let response = responseError as? NSHTTPURLResponse where !(response.statusCode >= 200 && response.statusCode < 300) else {
             return nil
         }
-        self.errorType = ErrorType(response: response)
+        self.errorType  = ErrorType(response: response)
         self.statusCode = response.statusCode
+        self.errorData = serverError
+    }
+    
+    // Parse the sever error ensuring that the server has an error or not
+    public static func parseServerError(data: NSData?) -> JSONDictionary?{
+        if let data = data {
+            let json = try? NSJSONSerialization.JSONObjectWithData(data, options: [])
+            guard let results = json as? JSONDictionary else { return nil }
+            return results
+        }
+ 
+        return nil
     }
 }
+

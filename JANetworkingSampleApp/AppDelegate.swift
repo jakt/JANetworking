@@ -8,6 +8,8 @@
 
 import UIKit
 
+let baseUrl = "http://demo3646012.mockable.io"
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 

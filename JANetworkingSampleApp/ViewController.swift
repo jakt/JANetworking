@@ -24,7 +24,8 @@ class ViewController: UIViewController {
         JANetworking.loadJSON(Post.all(headers)) { data, error in
             if let err = error {
                 print("`Post.all` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
-                print("`Post.all` - ERROR: \(err.errorType.errorMessage())")
+                print("`Post.all` - ERROR: \(err.errorType.errorDescription())")
+                print("`Post.all` - ERROR: \(err.errorData)")
             }else{
                 if let data = data {
                     print("`Post.all` - SUCCESS: \(data)")
@@ -37,7 +38,9 @@ class ViewController: UIViewController {
         JANetworking.loadJSON(post.submit(headers)) { data, error in
             if let err = error {
                 print("`Post.submit` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
-                print("`Post.submit` - ERROR: \(err.errorType.errorMessage())")
+                print("`Post.submit` - ERROR: \(err.errorType.errorDescription())")
+                print("`Post.submit` - ERROR: \(err.errorData)")
+
             }else{
                 if let data = data {
                     print("`Post.submit` - SUCCESS: \(data)")
@@ -46,19 +49,19 @@ class ViewController: UIViewController {
         }
         
         // Update a post
-        // ERROR endpoint, should return 404. I set it this way to test
+        // ERROR endpoint, should return 405. I set it this way to test
         post.title = "Random"
         JANetworking.loadJSON(post.update(headers)) { data, error in
             if let err = error {
                 print("`Post.update` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
-                print("`Post.update` - ERROR: \(err.errorType.errorMessage())")
+                print("`Post.update` - ERROR: \(err.errorType.errorDescription())")
+                print("`Post.update` - ERROR: \(err.errorData)")
             }else{
                 if let data = data {
                     print("`Post.update` - SUCCESS: \(data)")
                 }
             }
         }
-
     }
 
     override func didReceiveMemoryWarning() {
