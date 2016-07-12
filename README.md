@@ -101,7 +101,6 @@ let headers = ["Authorization": "SomeTokenValue"] // Add header example
 JANetworking.loadJSON(Post.all(headers)) { data, error in
     if let err = error {
         print("`Post.all` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
-        print("`Post.all` - ERROR: \(err.errorType.errorDescription())")
         print("`Post.all` - ERROR: \(err.errorData)")
     }else{
         if let data = data {
@@ -116,7 +115,6 @@ var post = Post(id: 100, userName: "Enrique W", title: "My Title", body: "Some M
 JANetworking.loadJSON(post.submit(headers)) { data, error in
     if let err = error {
         print("`Post.submit` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
-        print("`Post.submit` - ERROR: \(err.errorType.errorDescription())")
         print("`Post.submit` - ERROR: \(err.errorData)")
     }else{
         if let data = data {
@@ -130,7 +128,6 @@ There are 2 types of error: NSError, Response Error. You can access to the error
 ```
 if let err = error {
     print("`Post.submit` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
-    print("`Post.submit` - ERROR: \(err.errorType.errorDescription())")
     print("`Post.submit` - ERROR: \(err.errorData)")
 }
 ```
@@ -138,12 +135,8 @@ if let err = error {
 - This error occurs when `dataTaskWithRequest` returns an NSError, which is unrelated to the reponse error. This means that the request has failed.
 
 #### Reponse Error
- - This occurs when the `dataTaskWithRequest` returns success, However the reponse is within the range of status code ERROR (4xx or 5xx). Dependeding on the error the `error` field can vary. Usually it will be in this format: 
-```
-{
-    "error_type": "MethodNotAllowed",
-    "errors":[{
-         "message": "Method Get not allowed",
-    }]
-}
-```
+ - This occurs when the `dataTaskWithRequest` returns success, However the reponse is within the range of status code ERROR (4xx or 5xx)
+
+#### JAError
+JAError contains property, `JAError.field`, `JAError.message`  
+ You can access to the error object in `err.errorData` which returns an Array of JAError. 

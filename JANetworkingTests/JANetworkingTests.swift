@@ -34,51 +34,45 @@ class JANetworkingTests: XCTestCase {
     }
     
     func testJANetworkingError(){
-        let error1 = JANetworkingError(errorType: .Unauthorized, error: nil, statusCode: 401, errorData: nil)
+        let error1 = JANetworkingError(errorType: .Unauthorized, statusCode: 401, errorData: nil)
         XCTAssertNotNil(error1)
         XCTAssertNotNil(error1.errorType)
+        XCTAssertEqual(error1.errorType, ErrorType.Unauthorized)
         XCTAssertEqual(error1.statusCode, 401)
         XCTAssertEqual(error1.errorType.errorTitle(), "Access Denied")
-        XCTAssertEqual(error1.errorType.errorDescription(), "Authentication is needed to get requested response. This is similar to 403, but in this case, authentication is possible.")
 
-        let error2 = JANetworkingError(errorType: .Unknown, error: nil, statusCode: nil, errorData: nil)
+        let error2 = JANetworkingError(errorType: .Unknown, statusCode: nil, errorData: nil)
         XCTAssertNotNil(error2)
         XCTAssertNotNil(error2.errorType)
+        XCTAssertEqual(error2.errorType, ErrorType.Unknown)
         XCTAssertEqual(error2.errorType.errorTitle(), "Unknown")
-        XCTAssertEqual(error2.errorType.errorDescription(), "Sorry. Unexpected error.")
-        XCTAssertNil(error2.error)
         XCTAssertNil(error2.statusCode)
         
-        let error3 = JANetworkingError(error: NSError(domain: "somedomain", code: 123, userInfo: nil))
+        let error3 = JANetworkingError(error: NSError(domain: "somedomain", code: -1000, userInfo: nil))
         XCTAssertNotNil(error3)
-        XCTAssertNotNil(error3.error)
         XCTAssertNotNil(error3.errorType)
-        XCTAssertNotNil(error3.errorType.errorTitle(), "Unknown")
-        XCTAssertEqual(error3.errorType.errorDescription(), "Sorry. Unexpected error.")
+        XCTAssertEqual(error3.errorType, ErrorType.NSURLError)
+        XCTAssertEqual(error3.errorType.errorTitle(), "NSURLError")
         XCTAssertNil(error3.statusCode)
+        XCTAssertNotNil(error3.errorData)
 
         let error4 = JANetworkingError(responseError: NSHTTPURLResponse(URL: NSURL(string:"somedomain")!, statusCode: 200, HTTPVersion: nil, headerFields: nil), serverError: nil)
         XCTAssertNil(error4)
 
         let error5 = JANetworkingError(responseError: NSHTTPURLResponse(URL: NSURL(string:"somedomain")!, statusCode: 400, HTTPVersion: nil, headerFields: nil), serverError: nil)
         XCTAssertNotNil(error5)
-        XCTAssertNil(error5!.error)
         XCTAssertNotNil(error5!.errorType)
+        XCTAssertEqual(error5!.errorType, ErrorType.BadRequest)
         XCTAssertNotNil(error5!.errorType.errorTitle(), "Bad Request")
-        XCTAssertEqual(error5!.errorType.errorDescription(), "This response means that server could not understand the request due to invalid syntax.")
         XCTAssertEqual(error5!.statusCode, 400)
         XCTAssertNil(error5!.errorData)
 
-        let error6 = JANetworkingError(responseError: NSHTTPURLResponse(URL: NSURL(string:"somedomain")!, statusCode: 405, HTTPVersion: nil, headerFields: nil), serverError: ["message": "Some error"])
-        XCTAssertNotNil(error6)
+        let error6 = JANetworkingError(responseError: NSHTTPURLResponse(URL: NSURL(string:"somedomain")!, statusCode: 405, HTTPVersion: nil, headerFields: nil), serverError: [JAError(field: nil, message:"Some error")])
         XCTAssertNotNil(error6!.errorType)
+        XCTAssertEqual(error6!.errorType, ErrorType.MethodNotAllowed)
         XCTAssertEqual(error6!.statusCode, 405)
         XCTAssertEqual(error6!.errorType.errorTitle(), "Method Not Allowed")
-        XCTAssertEqual(error6!.errorType.errorDescription(), "The request method is known by the server but has been disabled and cannot be used. The two mandatory methods, GET and HEAD, must never be disabled and should not return this error code.")
         XCTAssertNotNil(error6!.errorData!)
-        if let msg = error6!.errorData!["message"] as? String {
-            XCTAssertEqual(msg, "Some error")
-        }
-        XCTAssertNil(error6!.error)
+        XCTAssertNotNil(error6!.errorData!.first?.message, "Some error")
     }
 }

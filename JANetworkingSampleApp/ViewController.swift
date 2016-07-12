@@ -23,8 +23,7 @@ class ViewController: UIViewController {
         let headers = ["Authorization": "SomeTokenValue"] // Add header example
         JANetworking.loadJSON(Post.all(headers)) { data, error in
             if let err = error {
-                print("`Post.all` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
-                print("`Post.all` - ERROR: \(err.errorType.errorDescription())")
+                print("`Post.all` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
                 print("`Post.all` - ERROR: \(err.errorData)")
             }else{
                 if let data = data {
@@ -37,8 +36,7 @@ class ViewController: UIViewController {
         var post = Post(id: 100, userName: "Enrique W", title: "My Title", body: "Some Message Here.")
         JANetworking.loadJSON(post.submit(headers)) { data, error in
             if let err = error {
-                print("`Post.submit` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
-                print("`Post.submit` - ERROR: \(err.errorType.errorDescription())")
+                print("`Post.submit` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
                 print("`Post.submit` - ERROR: \(err.errorData)")
 
             }else{
@@ -53,8 +51,7 @@ class ViewController: UIViewController {
         post.title = "Random"
         JANetworking.loadJSON(post.update(headers)) { data, error in
             if let err = error {
-                print("`Post.update` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
-                print("`Post.update` - ERROR: \(err.errorType.errorDescription())")
+                print("`Post.update` - ERROR: \(err.statusCode) \(err.errorType.errorTitle()))")
                 print("`Post.update` - ERROR: \(err.errorData)")
             }else{
                 if let data = data {
