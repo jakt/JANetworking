@@ -13,8 +13,16 @@ public typealias SaveTokenBlock = (token:String?) -> ()
 
 public final class JANetworkingConfiguration {
     
-    public static let sharedConfiguration = JANetworkingConfiguration()
+    public static let sharedConfiguration = JANetworkingConfiguration() {
+        didSet {
+            // Default headers
+                sharedConfiguration.set(set("Content-Type", value: "application/json")
+                sharedConfiguration.set(set("Accept", value: "application/json")
+        }
+    }
     
+    public private(set) static var configurationHeaders:[String: String] = []
+
     private var loadToken: LoadTokenBlock?
     private var saveToken: SaveTokenBlock?
     
@@ -34,4 +42,10 @@ public final class JANetworkingConfiguration {
             sharedConfiguration.saveToken?(token: newValue)
         }
     }
+
+    public class func set(header:String, value:String?) {
+        sharedConfiguration.configurationHeaders[header] = value
+    }
+    
+
 }

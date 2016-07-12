@@ -15,8 +15,11 @@ public final class JANetworking {
         request.HTTPMethod = resource.method.rawValue
         
         // Setup headers
-        request.addValue("application/json", forHTTPHeaderField:"Content-Type")
-        request.addValue("application/json", forHTTPHeaderField: "Accept")
+        
+        // Add default headers
+        for (key, value) in JANetworkingConfiguration.configurationHeaders {
+            request.addValue(value, forHTTPHeaderField: key)
+        }
         
         // Add the JSON Web Token if we have it
         if let token = JANetworkingConfiguration.token {
