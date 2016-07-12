@@ -20,8 +20,16 @@ class ViewController: UIViewController {
         ///////////////////////////////////////////////////////////////////////////
         
         // Get all posts
-        let headers = ["Authorization": "SomeTokenValue"] // Add header example
-        JANetworking.loadJSON(Post.all(headers)) { data, error in
+        
+        JANetworkingConfiguration.setLoadToken { () -> (String?) in
+            return NSUserDefaults.standardUserDefaults().objectForKey("token") as? String
+        }
+        
+        JANetworkingConfiguration.setSaveToken { (token) in
+            NSUserDefaults.standardUserDefaults().setObject(token, forKey: "token")
+        }
+        
+        JANetworking.loadJSON(Post.all(nil)) { data, error in
             if let err = error {
                 print("`Post.all` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
                 print("`Post.all` - ERROR: \(err.errorData)")
@@ -34,7 +42,7 @@ class ViewController: UIViewController {
         
         // Create a Post object
         var post = Post(id: 100, userName: "Enrique W", title: "My Title", body: "Some Message Here.")
-        JANetworking.loadJSON(post.submit(headers)) { data, error in
+        JANetworking.loadJSON(post.submit(nil)) { data, error in
             if let err = error {
                 print("`Post.submit` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
                 print("`Post.submit` - ERROR: \(err.errorData)")
@@ -49,7 +57,7 @@ class ViewController: UIViewController {
         // Update a post
         // ERROR endpoint, should return 405. I set it this way to test
         post.title = "Random"
-        JANetworking.loadJSON(post.update(headers)) { data, error in
+        JANetworking.loadJSON(post.update(nil)) { data, error in
             if let err = error {
                 print("`Post.update` - ERROR: \(err.statusCode) \(err.errorType.errorTitle()))")
                 print("`Post.update` - ERROR: \(err.errorData)")

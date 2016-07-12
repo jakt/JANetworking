@@ -17,7 +17,12 @@ public final class JANetworking {
         // Setup headers
         request.addValue("application/json", forHTTPHeaderField:"Content-Type")
         request.addValue("application/json", forHTTPHeaderField: "Accept")
-
+        
+        // Add the JSON Web Token if we have it
+        if let token = JANetworkingConfiguration.token {
+            request.addValue("JWT \(token)", forHTTPHeaderField: "Authorization")
+        }
+        
         if let headers = resource.headers {
             for (key, value) in headers {
                 request.addValue(value, forHTTPHeaderField: key)
@@ -32,7 +37,6 @@ public final class JANetworking {
         NSURLSession.sharedSession().dataTaskWithRequest(request) { data, response, error in
             // error is nil when request fails. Not nil when the request passes. However even if the request went through, the reponse can be of status code error 400 up or 500 up
             print("\n\(request.HTTPMethod) -- \(request.URL!.absoluteString)")
-
             if let errorObj = error {
                 let networkError = JANetworkingError(error: errorObj)
                 completion(nil, error: networkError)

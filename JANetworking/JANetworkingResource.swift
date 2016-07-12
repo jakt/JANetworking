@@ -33,6 +33,13 @@ extension JANetworkingResource {
         self.params = params
         self.parse = { data in
             let json = try? NSJSONSerialization.JSONObjectWithData(data, options: [])
+            
+            // Check for a JSON Web Token
+            if let parsedData = json as? JSONDictionary, token = parsedData["token"] as? String {
+                print("Token: \(token)")
+                JANetworkingConfiguration.token = token
+            }
+            
             return json.flatMap(parseJSON)
         }
     }

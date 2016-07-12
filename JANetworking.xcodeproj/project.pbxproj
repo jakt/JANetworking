@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		45AD782A1D357174007E7CFF /* JANetworkingConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AD78291D357174007E7CFF /* JANetworkingConfiguration.swift */; };
 		CDD253D21D2C16A5009E635F /* JANetworking.h in Headers */ = {isa = PBXBuildFile; fileRef = CDD253D11D2C16A5009E635F /* JANetworking.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CDD253D91D2C16A5009E635F /* JANetworking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDD253CE1D2C16A5009E635F /* JANetworking.framework */; };
 		CDD253DE1D2C16A5009E635F /* JANetworkingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD253DD1D2C16A5009E635F /* JANetworkingTests.swift */; };
@@ -32,6 +33,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		45AD78291D357174007E7CFF /* JANetworkingConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JANetworkingConfiguration.swift; sourceTree = "<group>"; };
 		CDD253CE1D2C16A5009E635F /* JANetworking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JANetworking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDD253D11D2C16A5009E635F /* JANetworking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JANetworking.h; sourceTree = "<group>"; };
 		CDD253D31D2C16A5009E635F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 				CDD253D11D2C16A5009E635F /* JANetworking.h */,
 				CDD253D31D2C16A5009E635F /* Info.plist */,
 				CDD253E81D2C16D0009E635F /* JANetworking.swift */,
+				45AD78291D357174007E7CFF /* JANetworkingConfiguration.swift */,
 				CDD253EA1D2C171C009E635F /* JANetworkingResource.swift */,
 				CDD254051D2C39B3009E635F /* JANetworkingError.swift */,
 			);
@@ -282,6 +285,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CDD253E91D2C16D0009E635F /* JANetworking.swift in Sources */,
+				45AD782A1D357174007E7CFF /* JANetworkingConfiguration.swift in Sources */,
 				CDD254061D2C39B3009E635F /* JANetworkingError.swift in Sources */,
 				CDD253EB1D2C171C009E635F /* JANetworkingResource.swift in Sources */,
 			);
