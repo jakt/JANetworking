@@ -17,7 +17,7 @@ public final class JANetworking {
         // Setup headers
         
         // Add default headers
-        for (key, value) in JANetworkingConfiguration.configurationHeaders {
+        for (key, value) in JANetworkingConfiguration.sharedConfiguration.configurationHeaders {
             request.addValue(value, forHTTPHeaderField: key)
         }
         
@@ -31,7 +31,7 @@ public final class JANetworking {
                 request.addValue(value, forHTTPHeaderField: key)
             }
         }
-        
+    
         // Setup params
         if let params = resource.params, jsonParams = try? NSJSONSerialization.dataWithJSONObject(params, options: []) {
             request.HTTPBody = jsonParams
