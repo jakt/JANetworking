@@ -34,8 +34,8 @@ extension Post {
     static func all(headers: [String: String]?) -> JANetworkingResource<[Post]>{
         let url = NSURL(string: baseUrl + "/posts")!
         return JANetworkingResource(method: .GET, url: url, headers: headers, params: nil, parseJSON: { json in
-            guard let dictionaryArray = json as? [JSONDictionary] else { return nil }
-            return dictionaryArray.flatMap(Post.init)
+            guard let dictionary = json as? JSONDictionary, result = dictionary["results"] as? [JSONDictionary] else { return nil }
+            return result.flatMap(Post.init)
         })
     }
     

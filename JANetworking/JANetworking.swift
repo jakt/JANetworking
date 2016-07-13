@@ -41,14 +41,18 @@ public final class JANetworking {
             // error is nil when request fails. Not nil when the request passes. However even if the request went through, the reponse can be of status code error 400 up or 500 up
             print("\n\(request.HTTPMethod) -- \(request.URL!.absoluteString)")
             if let errorObj = error {
-                let networkError = JANetworkingError(error: errorObj)
-                dispatch_async(dispatch_get_main_queue(),{ completion(nil, error: networkError) })
+                dispatch_async(dispatch_get_main_queue(),{
+                    let networkError = JANetworkingError(error: errorObj)
+                    completion(nil, error: networkError)
+                })
             }else{
-                // Success request, HOWEVER the reponse can be with status code 400 and up (Errors)
-                // Ensure that there is no error in the reponse and in the server
-                let networkError = JANetworkingError(responseError: response, serverError: JANetworkingError.parseServerError(data))
-                let results = data.flatMap(resource.parse)
-                dispatch_async(dispatch_get_main_queue(),{ completion(results, error: networkError) })
+                dispatch_async(dispatch_get_main_queue(),{
+                    // Success request, HOWEVER the reponse can be with status code 400 and up (Errors)
+                    // Ensure that there is no error in the reponse and in the server
+                    let networkError = JANetworkingError(responseError: response, serverError: JANetworkingError.parseServerError(data))
+                    let results = data.flatMap(resource.parse)
+                    completion(results, error: networkError)
+                })
             }
             
         }.resume()
