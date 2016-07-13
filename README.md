@@ -140,3 +140,12 @@ if let err = error {
 #### JAError
 JAError contains property, `JAError.field`, `JAError.message`  
  You can access to the error object in `err.errorData` which returns an Array of JAError. 
+ 
+ ### JANetworkingConfiguration
+You can configure the behavior of requests by using `JANetworkConfiguration`
+
+- `set(header:String, value:String?)` - Set the request headers for network requests
+- `setSaveToken(block:SaveTokenBlock)` - Customize how the token is saved
+- `setLoadToken(block:LoadTokenBlock)` - Customize how the token is loaded
+
+- `setUpRefreshTimer(timeInterval:NSTimeInterval, block:RefreshTimerBlock?)`- Sets how often the token should be refreshed and how it should be handled
