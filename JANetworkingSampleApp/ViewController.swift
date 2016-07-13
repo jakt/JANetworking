@@ -29,6 +29,10 @@ class ViewController: UIViewController {
             NSUserDefaults.standardUserDefaults().setObject(token, forKey: "token")
         }
         
+        JANetworkingConfiguration.setUpRefreshTimer(2) {
+            print("testing token...")
+        }
+        
         JANetworking.loadJSON(Post.all(nil)) { data, error in
             if let err = error {
                 print("`Post.all` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
@@ -67,6 +71,18 @@ class ViewController: UIViewController {
                 }
             }
         }
+        
+        JANetworking.loadJSON(Post.all(nil)) { data, error in
+            if let err = error {
+                print("`Post.all` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
+                print("`Post.all` - ERROR: \(err.errorData)")
+            }else{
+                if let data = data {
+                    print("`Post.all` - SUCCESS: \(data)")
+                }
+            }
+        }
+        
     }
 
     override func didReceiveMemoryWarning() {
