@@ -141,11 +141,40 @@ if let err = error {
 JAError contains property, `JAError.field`, `JAError.message`  
  You can access to the error object in `err.errorData` which returns an Array of JAError. 
  
- ### JANetworkingConfiguration
-You can configure the behavior of requests by using `JANetworkConfiguration`
+### JANetworkingConfiguration
+You can configure the behavior of requests by using `JANetworkConfiguration`  
 
 - `set(header:String, value:String?)` - Set the request headers for network requests
 - `setSaveToken(block:SaveTokenBlock)` - Customize how the token is saved
 - `setLoadToken(block:LoadTokenBlock)` - Customize how the token is loaded
 
 - `setUpRefreshTimer(timeInterval:NSTimeInterval, block:RefreshTimerBlock?)`- Sets how often the token should be refreshed and how it should be handled
+
+### Downloading image
+There are two ways to download an image:
+#### ImageView Extension
+`imageView.downloadImage(url: String, placeholder: UIImage? = nil)`  
+```
+@IBOutlet var imageView: UIImageView!
+...
+// Download image with imageview extension
+let placeholder = UIImage(named: "placeholder")
+imageView.setupImage("http://www.flooringvillage.co.uk/ekmps/shops/flooringvillage/images/request-a-sample--547-p.jpg", placeholder: placeholder)
+        
+```
+#### JANetworking Image Download
+`JANetworking.loadImage(url: String, completion:(UIImage?, error: JANetworkingError?) -> ())`   
+```
+// Normal download image
+JANetworking.loadImage("https://www.ricoh.com/r_dc/cx/cx1/img/sample_04.jpg") { (image, error) in
+    if let err = error {
+        print("`Load.image` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
+        print("`Load.image` - ERROR: \(err.errorData)")
+    }else{
+        if let img = image {
+            print("`Load.image` - SUCCESS: \(img)")
+            self.imageView2.image = img
+        }
+    }
+}
+```

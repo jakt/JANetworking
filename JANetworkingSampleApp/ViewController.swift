@@ -10,6 +10,8 @@ import UIKit
 import JANetworking
 
 class ViewController: UIViewController {
+    @IBOutlet var imageView: UIImageView!
+    @IBOutlet var imageView2: UIImageView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,6 +85,22 @@ class ViewController: UIViewController {
             }
         }
         
+        // Download image with imageview extension
+        let placeholder = UIImage(named: "placeholder")
+        imageView.downloadImage("http://www.flooringvillage.co.uk/ekmps/shops/flooringvillage/images/request-a-sample--547-p.jpg", placeholder: placeholder)
+        
+        // Normal download image
+        JANetworking.loadImage("https://www.ricoh.com/r_dc/cx/cx1/img/sample_04.jpg") { (image, error) in
+            if let err = error {
+                print("`Load.image` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
+                print("`Load.image` - ERROR: \(err.errorData)")
+            }else{
+                if let img = image {
+                    print("`Load.image` - SUCCESS: \(img)")
+                    self.imageView2.image = img
+                }
+            }
+        }
     }
 
     override func didReceiveMemoryWarning() {
