@@ -17,6 +17,8 @@ public enum ErrorType {
     // https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Miscellaneous/Foundation_Constants/index.html#//apple_ref/doc/constant_group/URL_Loading_System_Error_Codes
     case NSURLError
     
+    case InvalidToken
+    
     case BadRequest
     case Unauthorized
     case NotFound
@@ -26,13 +28,17 @@ public enum ErrorType {
     case ServiceUnavailable
     case GatewayTimeout
     
-    init(response: NSHTTPURLResponse) {
+    init(response: NSHTTPURLResponse, error: JAError?) {
         // Check what kind of error type based on response
         switch response.statusCode {
             
         // Response Error
         case 400:
-            self = .BadRequest
+            if error?.field == "token" && error?.message == "Signature has expired." { // Check for invalid token
+                self = .InvalidToken
+            }else {
+                self = .BadRequest
+            }
             break
         case 401:
             self = .Unauthorized
@@ -63,6 +69,8 @@ public enum ErrorType {
     
     public func errorTitle() -> String {
         switch self {
+        case .InvalidToken:
+            return "Invalid Token"
             
         // Response Error
         case .BadRequest:
@@ -116,7 +124,7 @@ extension JANetworkingError {
         guard let response = responseError as? NSHTTPURLResponse where !(response.statusCode >= 200 && response.statusCode < 300) else {
             return nil
         }
-        self.errorType  = ErrorType(response: response)
+        self.errorType  = ErrorType(response: response, error: serverError?.first)
         self.statusCode = response.statusCode
         self.errorData = serverError
     }
@@ -130,6 +138,7 @@ extension JANetworkingError {
             let errorArray = errors.map({
                 JAError(field: $0["field"] as? String, message: $0["message"] as? String)
             })
+            
             return errorArray
         }
  
