@@ -90,7 +90,7 @@ class ViewController: UIViewController {
         imageView.downloadImage("http://www.flooringvillage.co.uk/ekmps/shops/flooringvillage/images/request-a-sample--547-p.jpg", placeholder: placeholder)
         
         // Normal download image
-        JANetworking.loadImage("https://www.ricoh.com/r_dc/cx/cx1/img/sample_04.jpg") { (image, error) in
+        JANetworking.loadImage("https://www.ricoh.com/r_dc/cx/cx1/img/sample_04.jpg") { (image, location, error) in
             if let err = error {
                 print("`Load.image` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
                 print("`Load.image` - ERROR: \(err.errorData)")

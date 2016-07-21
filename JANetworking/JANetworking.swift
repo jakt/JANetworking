@@ -59,7 +59,7 @@ public final class JANetworking {
     }
     
     // Load image
-    public static func loadImage(url: String, completion:(UIImage?, error: JANetworkingError?) -> ()){
+    public static func loadImage(url: String, completion:(image:UIImage?,saveLocation:String?, error: JANetworkingError?) -> ()){
         
         let documentsURL = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)[0]
         let imageDirectory = documentsURL.URLByAppendingPathComponent("image_cache")
@@ -74,13 +74,13 @@ public final class JANetworking {
         // Check local disk for image 
         if let imageURL = imageURL where checkImage.fileExistsAtPath(imageURL) && JANetworkingConfiguration.sharedConfiguration.automaticallySaveImageToDisk {
             let image = UIImage(contentsOfFile: imageURL)
-            completion(image, error: nil)
+            completion(image: image,saveLocation: imageURL, error: nil)
         } else {
             NSURLSession.sharedSession().dataTaskWithURL(NSURL(string: url)!) { (data, response, error) in
                 if let errorObj = error {
                     dispatch_async(dispatch_get_main_queue(),{
                         let networkError = JANetworkingError(error: errorObj)
-                        completion(nil, error: networkError)
+                        completion(image: nil,saveLocation: nil, error: networkError)
                     })
                 }else{
                     var image:UIImage?
@@ -105,7 +105,7 @@ public final class JANetworking {
                         }
                     }
                     dispatch_async(dispatch_get_main_queue(),{
-                        completion(image, error: networkError)
+                        completion(image: image,saveLocation: imageURL, error: networkError)
                     })
                 }
                 }.resume()
@@ -118,7 +118,7 @@ public final class JANetworking {
 public extension UIImageView {
     func downloadImage(url: String, placeholder: UIImage? = nil){
         image = placeholder
-        JANetworking.loadImage(url) { (image, error) in
+        JANetworking.loadImage(url) { (image, location, error) in
             if let err = error {
                 print("`JANetworking Load.image` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
                 print("`JANetworking Load.image` - ERROR: \(err.errorData)")
