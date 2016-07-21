@@ -15,7 +15,8 @@ public typealias RefreshTimerBlock = () -> ()
 public final class JANetworkingConfiguration {
     
     public static let sharedConfiguration = JANetworkingConfiguration()
-    
+    public var automaticallySaveImageToDisk = true
+
     public private(set) var configurationHeaders = ["Content-Type":"application/json",
                                                     "Accept":"application/json"]
     
