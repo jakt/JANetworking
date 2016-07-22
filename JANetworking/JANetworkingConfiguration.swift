@@ -14,6 +14,12 @@ public typealias RefreshTimerBlock = () -> ()
 
 public final class JANetworkingConfiguration {
     
+    public enum NetworkEnvironment {
+        case Development
+        case Staging
+        case Production
+    }
+    
     public static let sharedConfiguration = JANetworkingConfiguration()
     public var automaticallySaveImageToDisk = true
 
@@ -24,7 +30,26 @@ public final class JANetworkingConfiguration {
         print("Networking Configuration Load Token not set")
         return nil
     }
-
+    
+    private var baseURL:String {
+        get {
+            switch currentEnvironment {
+            case .Development:
+                return developmentBaseURL
+            case .Staging:
+                return stagingBaseURL
+            case .Production:
+                return productionBaseURL
+            }
+        }
+    }
+    
+    private var currentEnvironment:NetworkEnvironment = .Development
+    
+    private var developmentBaseURL = ""
+    private var stagingBaseURL = ""
+    private var productionBaseURL = ""
+    
     private var saveToken: SaveTokenBlock? = { (token) in
         print("Networking Configuration Save Token not set")
     }
@@ -53,6 +78,11 @@ public final class JANetworkingConfiguration {
         sharedConfiguration.configurationHeaders[header] = value
     }
     
+    public class func setBaseURL(development:String, staging:String, production:String) {
+        sharedConfiguration.developmentBaseURL = development
+        sharedConfiguration.stagingBaseURL = staging
+        sharedConfiguration.productionBaseURL = production
+    }
     
     public class func setUpRefreshTimer(timeInterval:NSTimeInterval, block:RefreshTimerBlock?) {
         sharedConfiguration.refreshTimerBlock = block
