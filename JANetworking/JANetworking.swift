@@ -36,7 +36,8 @@ public final class JANetworking {
         if let params = resource.params as? [String:String]{
             if resource.method == .GET { 
                 let query = buildQueryString(fromDictionary: params)
-                request.URL = request.URL?.URLByAppendingPathComponent(query)
+                let baseURL = request.URL!.absoluteString
+                request.URL = NSURL(string: baseURL + query)
             } else {
                 if let jsonParams = try? NSJSONSerialization.dataWithJSONObject(params, options: []) {
                     request.HTTPBody = jsonParams
