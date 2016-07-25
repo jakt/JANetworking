@@ -31,20 +31,24 @@ public final class JANetworkingConfiguration {
         return nil
     }
     
-    private var baseURL:String {
+    private var currentEnvironment:NetworkEnvironment = .Development
+
+    public class var baseURL:String {
         get {
-            switch currentEnvironment {
+            switch sharedConfiguration.currentEnvironment {
             case .Development:
-                return developmentBaseURL
+                return sharedConfiguration.developmentBaseURL
             case .Staging:
-                return stagingBaseURL
+                return sharedConfiguration.stagingBaseURL
             case .Production:
-                return productionBaseURL
+                return sharedConfiguration.productionBaseURL
             }
         }
     }
-    
-    private var currentEnvironment:NetworkEnvironment = .Development
+        
+    public class func set(environment:NetworkEnvironment) {
+        sharedConfiguration.currentEnvironment = environment
+    }
     
     private var developmentBaseURL = ""
     private var stagingBaseURL = ""
