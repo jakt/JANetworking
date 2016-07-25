@@ -33,10 +33,17 @@ public final class JANetworking {
         }
     
         // Setup params
-        if let params = resource.params, jsonParams = try? NSJSONSerialization.dataWithJSONObject(params, options: []) {
-            request.HTTPBody = jsonParams
+        if let params = resource.params as? [String:String]{
+            if resource.method == .GET { 
+                let query = buildQueryString(fromDictionary: params)
+                request.URL = request.URL?.URLByAppendingPathComponent(query)
+            } else {
+                if let jsonParams = try? NSJSONSerialization.dataWithJSONObject(params, options: []) {
+                    request.HTTPBody = jsonParams
+                }
+            }
+           
         }
-        
         NSURLSession.sharedSession().dataTaskWithRequest(request) { data, response, error in
             // error is nil when request fails. Not nil when the request passes. However even if the request went through, the reponse can be of status code error 400 up or 500 up
             print("\n\(request.HTTPMethod) -- \(request.URL!.absoluteString)")
@@ -110,6 +117,16 @@ public final class JANetworking {
                 }
                 }.resume()
         }
+    }
+    
+    private static func buildQueryString(fromDictionary parameters: [String:String]) -> String {
+        var urlVars:[String] = []
+        for (k, value) in parameters {
+            if let encodedValue = value.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet()) {
+                urlVars.append(k + "=" + encodedValue)
+            }
+        }
+        return urlVars.isEmpty ? "" : "?" + urlVars.joinWithSeparator("&")
     }
 }
 
