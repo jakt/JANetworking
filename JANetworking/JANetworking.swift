@@ -67,28 +67,19 @@ public final class JANetworking {
     }
     
     // Load image
-    public static func loadImage(url: String, completion:(image:UIImage?,saveLocation:String?, error: JANetworkingError?) -> ()){
-        
-        let documentsURL = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)[0]
-        let imageDirectory = documentsURL.URLByAppendingPathComponent("image_cache")
-        
-        var saveName = url
-        saveName = saveName.stringByReplacingOccurrencesOfString("/", withString: "")
-        
-        let imageURL = imageDirectory.URLByAppendingPathComponent("\(saveName)").path
-
+    public static func loadImage(url: String, completion:(image:UIImage?, error: JANetworkingError?) -> ()){
+        let imageURL = locationForImageAtURL(url)
         let checkImage = NSFileManager.defaultManager()
-        
         // Check local disk for image 
         if let imageURL = imageURL where checkImage.fileExistsAtPath(imageURL) && JANetworkingConfiguration.sharedConfiguration.automaticallySaveImageToDisk {
             let image = UIImage(contentsOfFile: imageURL)
-            completion(image: image,saveLocation: imageURL, error: nil)
+            completion(image: image, error: nil)
         } else {
             NSURLSession.sharedSession().dataTaskWithURL(NSURL(string: url)!) { (data, response, error) in
                 if let errorObj = error {
                     dispatch_async(dispatch_get_main_queue(),{
                         let networkError = JANetworkingError(error: errorObj)
-                        completion(image: nil,saveLocation: nil, error: networkError)
+                        completion(image: nil, error: networkError)
                     })
                 }else{
                     var image:UIImage?
@@ -98,7 +89,7 @@ public final class JANetworking {
                     
                     if let imageData = data {
                         image = UIImage(data: imageData)
-                        
+                        let imageDirectory = imageDirectoryPath
                         if let imageURL = imageURL where image != nil && JANetworkingConfiguration.sharedConfiguration.automaticallySaveImageToDisk {
                             do {
                                 // add directory if it doesn't exist
@@ -113,11 +104,37 @@ public final class JANetworking {
                         }
                     }
                     dispatch_async(dispatch_get_main_queue(),{
-                        completion(image: image,saveLocation: imageURL, error: networkError)
+                        completion(image: image, error: networkError)
                     })
                 }
                 }.resume()
         }
+    }
+    
+    public static func removeImageAtUrl(url:String) -> Bool {
+        if let imageURL = locationForImageAtURL(url) {
+            do {
+                try NSFileManager.defaultManager().removeItemAtPath(imageURL)
+                return true
+            } catch let fileError{
+                print(fileError)
+            }
+        } else {
+            // Could no parse image url
+            return false
+        }
+        
+        return false
+    }
+    
+    public static func removeAllCachedImages() -> Bool {
+        do {
+            try NSFileManager.defaultManager().removeItemAtURL(imageDirectoryPath)
+            return true
+        } catch let fileError {
+            print(fileError)
+        }
+        return false
     }
     
     private static func buildQueryString(fromDictionary parameters: [String:String]) -> String {
@@ -129,6 +146,21 @@ public final class JANetworking {
         }
         return urlVars.isEmpty ? "" : "?" + urlVars.joinWithSeparator("&")
     }
+    
+    private static func locationForImageAtURL(url:String) -> String? {
+        let imageDirectory = imageDirectoryPath
+        var saveName = url
+        saveName = saveName.stringByReplacingOccurrencesOfString("/", withString: "")
+        let imageURL = imageDirectory.URLByAppendingPathComponent("\(saveName)").path
+        
+        return imageURL
+    }
+    
+    private static var imageDirectoryPath:NSURL {
+        let documentsURL = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)[0]
+        let imageDirectory = documentsURL.URLByAppendingPathComponent("image_cache")
+        return imageDirectory
+    }
 }
 
 // ImageView Extension for convinience use
@@ -136,7 +168,7 @@ public final class JANetworking {
 public extension UIImageView {
     func downloadImage(url: String, placeholder: UIImage? = nil){
         image = placeholder
-        JANetworking.loadImage(url) { (image, location, error) in
+        JANetworking.loadImage(url) { (image, error) in
             if let err = error {
                 print("`JANetworking Load.image` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
                 print("`JANetworking Load.image` - ERROR: \(err.errorData)")
