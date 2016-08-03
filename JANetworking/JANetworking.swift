@@ -68,7 +68,7 @@ public final class JANetworking {
     
     // Load image
     public static func loadImage(url: String, completion:(image:UIImage?, error: JANetworkingError?) -> ()){
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) { 
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
             let imageURL = locationForImageAtURL(url)
             let checkImage = NSFileManager.defaultManager()
             // Check local disk for image 
@@ -76,9 +76,9 @@ public final class JANetworking {
                 let image = UIImage(contentsOfFile: imageURL)
                 dispatch_async(dispatch_get_main_queue(),{
                     completion(image: image, error: nil)
-                }
+                })
             } else {
-                NSURLSession.sharedSession().dataTaskWithURL(NSURL(string: url)!) { (data, response, error) in
+                 NSURLSession.sharedSession().dataTaskWithURL(NSURL(string: url)!) { (data, response, error) in
                     if let errorObj = error {
                         dispatch_async(dispatch_get_main_queue(),{
                             let networkError = JANetworkingError(error: errorObj)
