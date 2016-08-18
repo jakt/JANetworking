@@ -72,7 +72,15 @@ public final class JANetworking {
     }
     
     // Load image
-    public static func loadImageMedia(url: String, type:MediaType, completion:(image:UIImage?, error: JANetworkingError?) -> ()){
+    public static func loadImage(url: String, completion:(image:UIImage?, error: JANetworkingError?) -> ()){
+        JANetworking.loadImageMedia(url, type: .Image, completion: completion)
+    }
+    
+    public static func loadGIF(url: String, completion:(image:UIImage?, error: JANetworkingError?) -> ()){
+        JANetworking.loadImageMedia(url, type: .GIF, completion: completion)
+    }
+    
+    private static func loadImageMedia(url: String, type:MediaType, completion:(image:UIImage?, error: JANetworkingError?) -> ()){
         // Check local disk for image
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),{
             let localURL = locationForImageAtURL(url)
