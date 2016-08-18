@@ -87,10 +87,14 @@ class ViewController: UIViewController {
         
         // Download image with imageview extension
         let placeholder = UIImage(named: "placeholder")
-        imageView.downloadImage("http://www.flooringvillage.co.uk/ekmps/shops/flooringvillage/images/request-a-sample--547-p.jpg", placeholder: placeholder)
+//        https://www.clicktorelease.com/code/gif/1.gif
+        imageView.downloadGIF("https://www.clicktorelease.com/code/gif/1.gif", placeholder: placeholder)
+//        imageView.downloadImage("http://www.flooringvillage.co.uk/ekmps/shops/flooringvillage/images/request-a-sample--547-p.jpg", placeholder: placeholder)
         
         // Normal download image
-        JANetworking.loadImage("https://www.ricoh.com/r_dc/cx/cx1/img/sample_04.jpg") { (image, error) in
+//        http://4.bp.blogspot.com/-uhjF2kC3tFc/U_r3myvwzHI/AAAAAAAACiw/tPQ2XOXFYKY/s1600/Circles-3.gif
+        JANetworking.loadImageMedia("http://4.bp.blogspot.com/-uhjF2kC3tFc/U_r3myvwzHI/AAAAAAAACiw/tPQ2XOXFYKY/s1600/Circles-3.gif", type: MediaType.GIF) { (image, error) in
+//        JANetworking.loadImage("https://www.ricoh.com/r_dc/cx/cx1/img/sample_04.jpg") { (image, error) in
             if let err = error {
                 print("`Load.image` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
                 print("`Load.image` - ERROR: \(err.errorData)")
