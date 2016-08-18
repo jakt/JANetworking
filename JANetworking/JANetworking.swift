@@ -68,53 +68,51 @@ public final class JANetworking {
     
     // Load image
     public static func loadImage(url: String, completion:(image:UIImage?, error: JANetworkingError?) -> ()){
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
-            let imageURL = locationForImageAtURL(url)
-            let checkImage = NSFileManager.defaultManager()
-            // Check local disk for image 
-            if let imageURL = imageURL where checkImage.fileExistsAtPath(imageURL) && JANetworkingConfiguration.sharedConfiguration.automaticallySaveImageToDisk {
+        let imageURL = locationForImageAtURL(url)
+        let checkImage = NSFileManager.defaultManager()
+        // Check local disk for image 
+        if let imageURL = imageURL where checkImage.fileExistsAtPath(imageURL) && JANetworkingConfiguration.sharedConfiguration.automaticallySaveImageToDisk {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
                 let image = UIImage(contentsOfFile: imageURL)
                 dispatch_async(dispatch_get_main_queue(),{
                     completion(image: image, error: nil)
                 })
-            } else {
-                 NSURLSession.sharedSession().dataTaskWithURL(NSURL(string: url)!) { (data, response, error) in
-                    if let errorObj = error {
-                        dispatch_async(dispatch_get_main_queue(),{
-                            let networkError = JANetworkingError(error: errorObj)
-                            completion(image: nil, error: networkError)
-                        })
-                    }else{
-                        var image:UIImage?
-                        // Success request, HOWEVER the reponse can be with status code 400 and up (Errors)
-                        // Ensure that there is no error in the reponse and in the server
-                        let networkError = JANetworkingError(responseError: response, serverError: JANetworkingError.parseServerError(data))
-                        
-                        if let imageData = data {
-                            image = UIImage(data: imageData)
-                            let imageDirectory = imageDirectoryPath
-                            if let imageURL = imageURL where image != nil && JANetworkingConfiguration.sharedConfiguration.automaticallySaveImageToDisk {
-                                do {
-                                    // add directory if it doesn't exist
-                                    if !imageDirectory.checkResourceIsReachableAndReturnError(nil) {
-                                        try NSFileManager.defaultManager().createDirectoryAtURL(imageDirectory, withIntermediateDirectories: true, attributes: nil)
-                                    }
-                                    // save file
-                                    try imageData.writeToFile(imageURL, options: .DataWritingAtomic)
-                                } catch let fileError {
-                                    print(fileError)
+            }
+        } else {
+             NSURLSession.sharedSession().dataTaskWithURL(NSURL(string: url)!) { (data, response, error) in
+                if let errorObj = error {
+                    dispatch_async(dispatch_get_main_queue(),{
+                        let networkError = JANetworkingError(error: errorObj)
+                        completion(image: nil, error: networkError)
+                    })
+                }else{
+                    var image:UIImage?
+                    // Success request, HOWEVER the reponse can be with status code 400 and up (Errors)
+                    // Ensure that there is no error in the reponse and in the server
+                    let networkError = JANetworkingError(responseError: response, serverError: JANetworkingError.parseServerError(data))
+                    
+                    if let imageData = data {
+                        image = UIImage(data: imageData)
+                        let imageDirectory = imageDirectoryPath
+                        if let imageURL = imageURL where image != nil && JANetworkingConfiguration.sharedConfiguration.automaticallySaveImageToDisk {
+                            do {
+                                // add directory if it doesn't exist
+                                if !imageDirectory.checkResourceIsReachableAndReturnError(nil) {
+                                    try NSFileManager.defaultManager().createDirectoryAtURL(imageDirectory, withIntermediateDirectories: true, attributes: nil)
                                 }
+                                // save file
+                                try imageData.writeToFile(imageURL, options: .DataWritingAtomic)
+                            } catch let fileError {
+                                print(fileError)
                             }
                         }
-                        dispatch_async(dispatch_get_main_queue(),{
-                            completion(image: image, error: networkError)
-                        })
                     }
-                    }.resume()
+                    dispatch_async(dispatch_get_main_queue(),{
+                        completion(image: image, error: networkError)
+                    })
+                }
+                }.resume()
             }
-            
-        }
-
     }
     
     public static func removeImageAtUrl(url:String) -> Bool {
