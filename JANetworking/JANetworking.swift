@@ -42,7 +42,7 @@ public final class JANetworking {
             if resource.method == .GET { 
                 let query = buildQueryString(fromDictionary: params)
                 let baseURL = request.URL!.absoluteString
-                request.URL = NSURL(string: baseURL + query)
+                request.URL = NSURL(string: baseURL! + query)
             } else {
                 if let jsonParams = try? NSJSONSerialization.dataWithJSONObject(params, options: []) {
                     request.HTTPBody = jsonParams
@@ -194,7 +194,7 @@ public final class JANetworking {
         let imageDirectory = imageDirectoryPath
         var saveName = url
         saveName = saveName.stringByReplacingOccurrencesOfString("/", withString: "")
-        let imageURL = imageDirectory.URLByAppendingPathComponent("\(saveName)").path
+        let imageURL = imageDirectory.URLByAppendingPathComponent("\(saveName)")!.path
         
         return imageURL
     }
@@ -202,7 +202,7 @@ public final class JANetworking {
     private static var imageDirectoryPath:NSURL {
         let documentsURL = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)[0]
         let imageDirectory = documentsURL.URLByAppendingPathComponent("image_cache")
-        return imageDirectory
+        return imageDirectory!
     }
 }
 
