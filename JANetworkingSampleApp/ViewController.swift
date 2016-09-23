@@ -31,7 +31,7 @@ class ViewController: UIViewController {
             NSUserDefaults.standardUserDefaults().setObject(token, forKey: "token")
         }
         
-        JANetworkingConfiguration.setUpRefreshTimer(2) {
+        JANetworkingConfiguration.setUpRefreshTimer(30) {
             print("testing token...")
         }
         
@@ -88,25 +88,14 @@ class ViewController: UIViewController {
         // Download image with imageview extension
         let placeholder = UIImage(named: "placeholder")
 //        https://www.clicktorelease.com/code/gif/1.gif
-        imageView.downloadGIF("https://www.clicktorelease.com/code/gif/1.gif", placeholder: placeholder)
+        imageView.downloadGIF("https://rs-exchange-staging.s3.amazonaws.com:443/asset/asset/86/15/51cd59696d975238ea37d195c540.gif", placeholder: placeholder)
 //        imageView.downloadImage("http://www.flooringvillage.co.uk/ekmps/shops/flooringvillage/images/request-a-sample--547-p.jpg", placeholder: placeholder)
         
         // Normal download image
 //        http://4.bp.blogspot.com/-uhjF2kC3tFc/U_r3myvwzHI/AAAAAAAACiw/tPQ2XOXFYKY/s1600/Circles-3.gif
-        JANetworking.loadImageMedia("http://4.bp.blogspot.com/-uhjF2kC3tFc/U_r3myvwzHI/AAAAAAAACiw/tPQ2XOXFYKY/s1600/Circles-3.gif", type: MediaType.GIF) { (image, error) in
-//        JANetworking.loadImage("https://www.ricoh.com/r_dc/cx/cx1/img/sample_04.jpg") { (image, error) in
-            if let err = error {
-                print("`Load.image` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
-                print("`Load.image` - ERROR: \(err.errorData)")
-            }else{
-                if let img = image {
-                    print("`Load.image` - SUCCESS: \(img)")
-                    self.imageView2.image = img
-                }
-            }
+        JANetworking.loadGIF("https://rs-exchange-staging.s3.amazonaws.com:443/asset/asset/86/15/51cd59696d975238ea37d195c540.gif") { (image, error) in
+            self.imageView2.image = image
         }
-//        JANetworking.removeAllImages()
-//        JANetworking.removeImageAtUrl("http://www.flooringvillage.co.uk/ekmps/shops/flooringvillage/images/request-a-sample--547-p.jpg")
     }
 
     override func didReceiveMemoryWarning() {

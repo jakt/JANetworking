@@ -210,7 +210,9 @@ public final class JANetworking {
 
 public extension UIImageView {
     func downloadImage(url: String, placeholder: UIImage? = nil){
-        image = placeholder
+        if let defaultImage = placeholder {
+            image = defaultImage
+        }
         JANetworking.loadImageMedia(url, type: .Image) { (image, error) in
             if let err = error {
                 print("`JANetworking Load.image` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
@@ -224,7 +226,9 @@ public extension UIImageView {
     }
     
     func downloadGIF(url: String, placeholder: UIImage? = nil){
-        image = placeholder
+        if let defaultImage = placeholder {
+            image = defaultImage
+        }
         JANetworking.loadImageMedia(url, type: .GIF) { (image, error) in
             if let err = error {
                 print("`JANetworking Load.image` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")

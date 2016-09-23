@@ -30,12 +30,16 @@ extension UIImage {
 //        }
         
         // Validate data
-        guard let imageData = NSData(contentsOfFile: gifUrl) else {
-            print("SwiftGif: Cannot turn image named \"\(gifUrl)\" into NSData")
-            return nil
+        if let imageData = NSData(contentsOfFile: gifUrl) {
+            return gifWithData(imageData)
+        } else {
+            print("Default gif load failed, use file manager")
+            guard let data = NSFileManager.defaultManager().contentsAtPath(gifUrl) else {
+                print("SwiftGif: Cannot turn image named \"\(gifUrl)\" into NSData")
+                return nil
+            }
+            return gifWithData(data)
         }
-        
-        return gifWithData(imageData)
     }
     
     public class func gifWithName(name: String) -> UIImage? {
