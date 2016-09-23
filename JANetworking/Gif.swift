@@ -22,13 +22,6 @@ extension UIImage {
     }
     
     public class func gifWithURL(gifUrl:String) -> UIImage? {
-        // Validate URL
-//        guard let bundleURL = NSURL(string: gifUrl)
-//            else {
-//                print("SwiftGif: This image named \"\(gifUrl)\" does not exist")
-//                return nil
-//        }
-        
         // Validate data
         if let imageData = NSData(contentsOfFile: gifUrl) {
             return gifWithData(imageData)
@@ -42,22 +35,22 @@ extension UIImage {
         }
     }
     
-    public class func gifWithName(name: String) -> UIImage? {
-        // Check for existance of gif
-        guard let bundleURL = NSBundle.mainBundle()
-            .URLForResource(name, withExtension: "gif") else {
-                print("SwiftGif: This image named \"\(name)\" does not exist")
-                return nil
-        }
-        
-        // Validate data
-        guard let imageData = NSData(contentsOfURL: bundleURL) else {
-            print("SwiftGif: Cannot turn image named \"\(name)\" into NSData")
-            return nil
-        }
-        
-        return gifWithData(imageData)
-    }
+//    public class func gifWithName(name: String) -> UIImage? {
+//        // Check for existance of gif
+//        guard let bundleURL = NSBundle.mainBundle()
+//            .URLForResource(name, withExtension: "gif") else {
+//                print("SwiftGif: This image named \"\(name)\" does not exist")
+//                return nil
+//        }
+//        
+//        // Validate data
+//        guard let imageData = NSData(contentsOfURL: bundleURL) else {
+//            print("SwiftGif: Cannot turn image named \"\(name)\" into NSData")
+//            return nil
+//        }
+//        
+//        return gifWithData(imageData)
+//    }
     
     class func delayForImageAtIndex(index: Int, source: CGImageSource) -> Double {
         var delay = 0.1
