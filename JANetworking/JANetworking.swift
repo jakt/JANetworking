@@ -214,22 +214,28 @@ public extension UIImageView {
             image = defaultImage
         }
         var thumbnailFirst = true
-        JAThumbnailManager.sharedManager.thumbnailForUrl(thumbnailUrl) { (image:UIImage) in
+        JAThumbnailManager.sharedManager.thumbnailForUrl(thumbnailUrl) { (image:UIImage?) in
             if thumbnailFirst {
                 self.image = image
             }
         }
-        JANetworking.loadImageMedia(url, type: .Image) { (image, error) in
-            if let err = error {
-                print("`JANetworking Load.image` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
-                print("`JANetworking Load.image` - ERROR: \(err.errorData)")
-            }else{
-                if let img = image {
-                    thumbnailFirst = false
-                    self.image = img
-                }
+        JAThumbnailManager.sharedManager.thumbnailForUrl(url) { (image:UIImage?) in
+            if let img = image {
+                thumbnailFirst = false
+                self.image = img
             }
         }
+//        JANetworking.loadImageMedia(url, type: .Image) { (image, error) in
+//            if let err = error {
+//                print("`JANetworking Load.image` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
+//                print("`JANetworking Load.image` - ERROR: \(err.errorData)")
+//            }else{
+//                if let img = image {
+//                    thumbnailFirst = false
+//                    self.image = img
+//                }
+//            }
+//        }
     }
     
     func downloadGIF(url: String, placeholder: UIImage? = nil, thumbnailUrl:String? = nil){
@@ -237,7 +243,7 @@ public extension UIImageView {
             image = defaultImage
         }
         var thumbnailFirst = true
-        JAThumbnailManager.sharedManager.thumbnailForUrl(thumbnailUrl) { (image:UIImage) in
+        JAThumbnailManager.sharedManager.thumbnailForUrl(thumbnailUrl) { (image:UIImage?) in
             if thumbnailFirst {
                 self.image = image
             }
@@ -250,6 +256,9 @@ public extension UIImageView {
                 if let img = image {
                     thumbnailFirst = false
                     self.image = img
+                    if let first = img.images?.first {
+                        JAThumbnailManager.sharedManager.saveImage(first, imageUrl: url)
+                    }
                 }
             }
         }

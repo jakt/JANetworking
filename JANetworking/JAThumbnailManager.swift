@@ -20,7 +20,7 @@ class JAThumbnailManager: NSObject {
         return library[imageUrl]
     }
     
-    func thumbnailForUrl(thumbnailUrl:String?, completion:((UIImage)->Void)) {
+    func thumbnailForUrl(thumbnailUrl:String?, completion:((UIImage?)->Void)) {
         if let thumbnail = thumbnailUrl {
             if let thumbnailImage = JAThumbnailManager.sharedManager.fetchImage(thumbnail) {
                 completion(thumbnailImage)
@@ -29,14 +29,19 @@ class JAThumbnailManager: NSObject {
                     if let err = error {
                         print("`JANetworking Load.image` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
                         print("`JANetworking Load.image` - ERROR: \(err.errorData)")
-                    }else{
+                        completion(nil)
+                    } else {
                         if let img = image {
                             self.saveImage(img, imageUrl: thumbnail)
                             completion(img)
+                        } else {
+                            completion(nil)
                         }
                     }
                 }
             }
+        } else {
+            completion(nil)
         }
     }
     
