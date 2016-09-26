@@ -80,7 +80,7 @@ public final class JANetworking {
         JANetworking.loadImageMedia(url, type: .GIF, completion: completion)
     }
     
-    private static func loadImageMedia(url: String, type:MediaType, completion:(image:UIImage?, error: JANetworkingError?) -> ()){
+    static func loadImageMedia(url: String, type:MediaType, completion:(image:UIImage?, error: JANetworkingError?) -> ()){
         // Check local disk for image
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),{
             let localURL = locationForImageAtURL(url)
@@ -209,9 +209,15 @@ public final class JANetworking {
 // ImageView Extension for convinience use
 
 public extension UIImageView {
-    func downloadImage(url: String, placeholder: UIImage? = nil){
+    func downloadImage(url: String, placeholder: UIImage? = nil, thumbnailUrl:String? = nil){
         if let defaultImage = placeholder {
             image = defaultImage
+        }
+        var thumbnailFirst = true
+        JAThumbnailManager.sharedManager.thumbnailForUrl(thumbnailUrl) { (image:UIImage) in
+            if thumbnailFirst {
+                self.image = image
+            }
         }
         JANetworking.loadImageMedia(url, type: .Image) { (image, error) in
             if let err = error {
@@ -219,15 +225,22 @@ public extension UIImageView {
                 print("`JANetworking Load.image` - ERROR: \(err.errorData)")
             }else{
                 if let img = image {
+                    thumbnailFirst = false
                     self.image = img
                 }
             }
         }
     }
     
-    func downloadGIF(url: String, placeholder: UIImage? = nil){
+    func downloadGIF(url: String, placeholder: UIImage? = nil, thumbnailUrl:String? = nil){
         if let defaultImage = placeholder {
             image = defaultImage
+        }
+        var thumbnailFirst = true
+        JAThumbnailManager.sharedManager.thumbnailForUrl(thumbnailUrl) { (image:UIImage) in
+            if thumbnailFirst {
+                self.image = image
+            }
         }
         JANetworking.loadImageMedia(url, type: .GIF) { (image, error) in
             if let err = error {
@@ -235,6 +248,7 @@ public extension UIImageView {
                 print("`JANetworking Load.image` - ERROR: \(err.errorData)")
             }else{
                 if let img = image {
+                    thumbnailFirst = false
                     self.image = img
                 }
             }
