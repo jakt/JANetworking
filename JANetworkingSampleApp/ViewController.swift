@@ -88,12 +88,14 @@ class ViewController: UIViewController {
         // Download image with imageview extension
         let placeholder = UIImage(named: "placeholder")
 //        https://www.clicktorelease.com/code/gif/1.gif
-        imageView.downloadGIF("https://rs-exchange-staging.s3.amazonaws.com:443/asset/asset/86/15/51cd59696d975238ea37d195c540.gif", placeholder: placeholder)
+//        https://static.pexels.com/photos/8700/wall-animal-dog-pet.jpg
+//        https://rs-exchange-staging.s3.amazonaws.com:443/asset/asset/86/15/51cd59696d975238ea37d195c540.gif
+        imageView.downloadImage("https://static.pexels.com/photos/8700/wall-animal-dog-pet.jpg", placeholder: placeholder)
 //        imageView.downloadImage("http://www.flooringvillage.co.uk/ekmps/shops/flooringvillage/images/request-a-sample--547-p.jpg", placeholder: placeholder)
         
         // Normal download image
 //        http://4.bp.blogspot.com/-uhjF2kC3tFc/U_r3myvwzHI/AAAAAAAACiw/tPQ2XOXFYKY/s1600/Circles-3.gif
-        JANetworking.loadGIF("https://rs-exchange-staging.s3.amazonaws.com:443/asset/asset/86/15/51cd59696d975238ea37d195c540.gif") { (image, error) in
+        JANetworking.loadImage("https://static.pexels.com/photos/33045/lion-wild-africa-african.jpg") { (image, error) in
             self.imageView2.image = image
         }
     }

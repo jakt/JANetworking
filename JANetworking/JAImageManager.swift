@@ -52,6 +52,6 @@ class JAImageManager: NSObject {
     
     func memoryWarning() {
         print("JAImageManager deleting all cached images due to memory warning")
-        library.removeAll()
+        library.removeAll(keepCapacity: false)
     }
 }
