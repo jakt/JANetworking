@@ -14,11 +14,11 @@ class JAImageManager: NSObject {
     
     override init() {
         super.init()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(JAImageManager.memoryWarning), name: UIApplicationDidReceiveMemoryWarningNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(JAImageManager.memoryWarning), name: NSNotification.Name.UIApplicationDidReceiveMemoryWarning, object: nil)
     }
     
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIApplicationDidReceiveMemoryWarningNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIApplicationDidReceiveMemoryWarning, object: nil)
     }
     
     private func saveImage(image:UIImage, imageUrl:String) {
@@ -29,18 +29,18 @@ class JAImageManager: NSObject {
         return library[imageUrl]
     }
     
-    func imageForUrl(imageUrl:String, completion:((UIImage?)->Void)) {
-        if let image = JAImageManager.sharedManager.fetchImage(imageUrl) {
+    func imageForUrl(imageUrl:String, completion:@escaping ((UIImage?)->Void)) {
+        if let image = JAImageManager.sharedManager.fetchImage(imageUrl: imageUrl) {
             completion(image)
         } else {
-            JANetworking.loadImageMedia(imageUrl, type: .Image) {[unowned self] (image, error) in
+            JANetworking.loadImageMedia(url: imageUrl, type: .image) {[unowned self] (image, error) in
                 if let err = error {
                     print("`JANetworking Load.image` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
                     print("`JANetworking Load.image` - ERROR: \(err.errorData)")
                     completion(nil)
                 } else {
                     if let img = image {
-                        self.saveImage(img, imageUrl: imageUrl)
+                        self.saveImage(image: img, imageUrl: imageUrl)
                         completion(img)
                     } else {
                         completion(nil)
@@ -52,6 +52,6 @@ class JAImageManager: NSObject {
     
     func memoryWarning() {
         print("JAImageManager deleting all cached images due to memory warning")
-        library.removeAll(keepCapacity: false)
+        library.removeAll(keepingCapacity: false)
     }
 }

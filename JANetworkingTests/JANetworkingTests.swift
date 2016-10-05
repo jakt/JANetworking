@@ -48,7 +48,7 @@ class JANetworkingTests: XCTestCase {
         XCTAssertEqual(error2.errorType.errorTitle(), "Unknown")
         XCTAssertNil(error2.statusCode)
         
-        let error3 = JANetworkingError(error: NSError(domain: "somedomain", code: -1000, userInfo: nil))
+        let error3 = JANetworkingError(error: Error(domain: "somedomain", code: -1000, userInfo: nil))
         XCTAssertNotNil(error3)
         XCTAssertNotNil(error3.errorType)
         XCTAssertEqual(error3.errorType, ErrorType.NSURLError)

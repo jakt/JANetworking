@@ -9,15 +9,15 @@
 import Foundation
 
 public typealias LoadTokenBlock = ()->(String?)
-public typealias SaveTokenBlock = (token:String?) -> ()
+public typealias SaveTokenBlock = (String?) -> ()
 public typealias RefreshTimerBlock = () -> ()
 
 public final class JANetworkingConfiguration {
     
     public enum NetworkEnvironment {
-        case Development
-        case Staging
-        case Production
+        case development
+        case staging
+        case production
     }
     
     public static let sharedConfiguration = JANetworkingConfiguration()
@@ -31,16 +31,16 @@ public final class JANetworkingConfiguration {
         return nil
     }
     
-    private var currentEnvironment:NetworkEnvironment = .Development
+    private var currentEnvironment:NetworkEnvironment = .development
 
     public class var baseURL:String {
         get {
             switch sharedConfiguration.currentEnvironment {
-            case .Development:
+            case .development:
                 return sharedConfiguration.developmentBaseURL
-            case .Staging:
+            case .staging:
                 return sharedConfiguration.stagingBaseURL
-            case .Production:
+            case .production:
                 return sharedConfiguration.productionBaseURL
             }
         }
@@ -58,14 +58,14 @@ public final class JANetworkingConfiguration {
         print("Networking Configuration Save Token not set")
     }
 
-    public class func setSaveToken(block:SaveTokenBlock) {
+    public class func setSaveToken(block:@escaping SaveTokenBlock) {
         sharedConfiguration.saveToken = block
         sharedConfiguration.refreshTimer?.invalidate()
         sharedConfiguration.refreshTimer = nil
         resetRefreshTimer()
     }
     
-    public class func setLoadToken(block:LoadTokenBlock) {
+    public class func setLoadToken(block:@escaping LoadTokenBlock) {
         sharedConfiguration.loadToken = block
     }
 
@@ -74,7 +74,7 @@ public final class JANetworkingConfiguration {
             return sharedConfiguration.loadToken?()
         }
         set {
-            sharedConfiguration.saveToken?(token: newValue)
+            sharedConfiguration.saveToken?(newValue)
         }
     }
 
@@ -88,7 +88,7 @@ public final class JANetworkingConfiguration {
         sharedConfiguration.productionBaseURL = production
     }
     
-    public class func setUpRefreshTimer(timeInterval:NSTimeInterval, block:RefreshTimerBlock?) {
+    public class func setUpRefreshTimer(timeInterval:TimeInterval, block:RefreshTimerBlock?) {
         sharedConfiguration.refreshTimerBlock = block
         sharedConfiguration.refreshTimerInterval = timeInterval
         if block == nil {
@@ -98,14 +98,14 @@ public final class JANetworkingConfiguration {
         }
     }
     
-    private var refreshTimer:NSTimer?
-    private var refreshTimerInterval:NSTimeInterval = 600
+    private var refreshTimer:Timer?
+    private var refreshTimerInterval:TimeInterval = 600
     private var refreshTimerBlock: RefreshTimerBlock?
     
     public class func resetRefreshTimer() {
         print("Refresh timer reset")
         sharedConfiguration.refreshTimer?.invalidate()
-        sharedConfiguration.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(sharedConfiguration.refreshTimerInterval, target: sharedConfiguration, selector: #selector(sharedConfiguration.refreshTimerFired), userInfo: nil, repeats: true)
+        sharedConfiguration.refreshTimer = Timer.scheduledTimer(timeInterval: sharedConfiguration.refreshTimerInterval, target: sharedConfiguration, selector: #selector(sharedConfiguration.refreshTimerFired), userInfo: nil, repeats: true)
     }
     
     @objc private func refreshTimerFired() {

@@ -11,89 +11,89 @@ import Foundation
 // Error bases on https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
 
 public enum ErrorType {
-    case Unknown
+    case unknown
     
     // Apple docs for nsurlerrors
     // https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Miscellaneous/Foundation_Constants/index.html#//apple_ref/doc/constant_group/URL_Loading_System_Error_Codes
-    case NSURLError
+    case nsurlError
     
-    case InvalidToken
+    case invalidToken
     
-    case BadRequest
-    case Unauthorized
-    case NotFound
-    case MethodNotAllowed
-    case InternalServerError
-    case BadGateway
-    case ServiceUnavailable
-    case GatewayTimeout
+    case badRequest
+    case unauthorized
+    case notFound
+    case methodNotAllowed
+    case internalServerError
+    case badGateway
+    case serviceUnavailable
+    case gatewayTimeout
     
-    init(response: NSHTTPURLResponse, error: JAError?) {
+    init(response: HTTPURLResponse, error: JAError?) {
         // Check what kind of error type based on response
         switch response.statusCode {
             
         // Response Error
         case 400:
             if error?.field == "token" && error?.message == "Signature has expired." { // Check for invalid token
-                self = .InvalidToken
+                self = .invalidToken
             }else {
-                self = .BadRequest
+                self = .badRequest
             }
             break
         case 401:
-            self = .Unauthorized
+            self = .unauthorized
             break
         case 404:
-            self = .NotFound
+            self = .notFound
             break
         case 405:
-            self = .MethodNotAllowed
+            self = .methodNotAllowed
             break
         case 500:
-            self = .InternalServerError
+            self = .internalServerError
             break
         case 502:
-            self = .BadGateway
+            self = .badGateway
             break
         case 503:
-            self = .ServiceUnavailable
+            self = .serviceUnavailable
             break
         case 504:
-            self = .GatewayTimeout
+            self = .gatewayTimeout
             break
             
         default:
-            self = .Unknown
+            self = .unknown
         }
     }
     
     public func errorTitle() -> String {
         switch self {
-        case .InvalidToken:
+        case .invalidToken:
             return "Invalid Token"
             
         // Response Error
-        case .BadRequest:
+        case .badRequest:
             return "Bad Request"
-        case .Unauthorized:
+        case .unauthorized:
             return "Access Denied"
-        case .NotFound:
+        case .notFound:
             return "Not Found"
-        case .MethodNotAllowed:
+        case .methodNotAllowed:
             return "Method Not Allowed"
-        case .InternalServerError:
+        case .internalServerError:
             return "Internal Server Error"
-        case .BadGateway:
+        case .badGateway:
             return "Bad Gateway"
-        case .ServiceUnavailable:
+        case .serviceUnavailable:
             return "Service Unavailable"
-        case .GatewayTimeout:
+        case .gatewayTimeout:
             return "Gateway Timeout"
             
-        case .Unknown:
+        case .unknown:
             return "Unknown"
             
-        case .NSURLError:
+        case .nsurlError:
             return "NSURLError"
         }
     }
@@ -111,17 +111,17 @@ public struct JANetworkingError {
 }
 
 extension JANetworkingError {
-    // Error init. An NSError object exist
-    public init(error: NSError) {
-        self.errorType = .NSURLError
+    // Error init. An Error object exist
+    public init(error: Error) {
+        self.errorType = .nsurlError
         let errorObject = JAError(field: nil, message: error.localizedDescription)
         self.errorData = [errorObject]
     }
     
     // Optional. Based on the response, it can still be an error depending on the status code
-    public init?(responseError: NSURLResponse?, serverError: [JAError]?) {
+    public init?(responseError: URLResponse?, serverError: [JAError]?) {
         // Make sure reponse exist and the status code is between the 2xx range
-        guard let response = responseError as? NSHTTPURLResponse where !(response.statusCode >= 200 && response.statusCode < 300) else {
+        guard let response = responseError as? HTTPURLResponse , !(response.statusCode >= 200 && response.statusCode < 300) else {
             return nil
         }
         self.errorType  = ErrorType(response: response, error: serverError?.first)
@@ -130,9 +130,9 @@ extension JANetworkingError {
     }
     
     // Parse the sever error ensuring that the server has an error or not
-    public static func parseServerError(data: NSData?) -> [JAError]?{
+    public static func parseServerError(data: Data?) -> [JAError]?{
         if let data = data {
-            let json = try? NSJSONSerialization.JSONObjectWithData(data, options: [])
+            let json = try? JSONSerialization.jsonObject(with: data, options: [])
             guard let results = json as? JSONDictionary else { return nil }
             guard let errors = results["errors"] as? [JSONDictionary] else { return nil }
             let errorArray = errors.map({

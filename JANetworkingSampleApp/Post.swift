@@ -17,11 +17,11 @@ struct Post {
 }
 
 extension Post {
-    init?(dictionary: [String: AnyObject]){
+    init?(dictionary: [String: Any]){
         guard let id = dictionary["id"] as? Int,
-            title = dictionary["title"] as? String,
-            userName = dictionary["user_name"] as? String,
-            body = dictionary["body"] as? String else { return nil }
+            let title = dictionary["title"] as? String,
+            let userName = dictionary["user_name"] as? String,
+            let body = dictionary["body"] as? String else { return nil }
         
         self.id = id
         self.userName = userName
@@ -32,16 +32,16 @@ extension Post {
     
     // Get all post
     static func all(headers: [String: String]?) -> JANetworkingResource<[Post]>{
-        let url = NSURL(string: baseUrl + "/posts")!
+        let url = URL(string: baseUrl + "/posts")!
         return JANetworkingResource(method: .GET, url: url, headers: headers, params: ["test":"test"], parseJSON: { json in
-            guard let dictionary = json as? JSONDictionary, result = dictionary["results"] as? [JSONDictionary] else { return nil }
+            guard let dictionary = json as? JSONDictionary, let result = dictionary["results"] as? [JSONDictionary] else { return nil }
             return result.flatMap(Post.init)
         })
     }
     
     // Submit a post
     func submit(headers: [String: String]?) -> JANetworkingResource<Post>{
-        let url = NSURL(string: baseUrl + "/posts")!
+        let url = URL(string: baseUrl + "/posts")!
         let params:JSONDictionary = ["id": id,
                                      "userName": userName,
                                      "title": title,
@@ -54,7 +54,7 @@ extension Post {
     
     // Update a post
     func update(headers: [String: String]?) -> JANetworkingResource<Post>{
-        let url = NSURL(string: baseUrl + "/posts/\(id)")!
+        let url = URL(string: baseUrl + "/posts/\(id)")!
         let params:JSONDictionary = ["id": id,
                                      "userName": userName,
                                      "title": title,
