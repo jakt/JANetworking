@@ -36,7 +36,6 @@ extension JANetworkingResource {
             
             // Check for a JSON Web Token
             if let parsedData = json as? JSONDictionary, let token = parsedData["token"] as? String {
-                print("Token: \(token)")
                 JANetworkingConfiguration.token = token
             }
             
