@@ -53,6 +53,9 @@ public final class JANetworking {
                 }
             }
         }
+        if let urlString = request.url?.absoluteString {
+            print(urlString)
+        }
         URLSession.shared.dataTask(with: request as URLRequest) { (data:Data?, response:URLResponse?, error:Error?) in
             // error is nil when request fails. Not nil when the request passes. However even if the request went through, the reponse can be of status code error 400 up or 500 up
             print("\n\(request.httpMethod) -- \(request.url!.absoluteString)")
@@ -84,7 +87,7 @@ public final class JANetworking {
                     let jsonData = try JSONSerialization.data(withJSONObject: value, options: JSONSerialization.WritingOptions())
                     let convertedString = String(data: jsonData, encoding: String.Encoding.utf8) // the data will be converted to the string
 //                    let stringWithoutQuotes = convertedString?.replacingOccurrences(of: "\"", with: "")
-                    newDictionary[key] = convertedString
+                    newDictionary[key] = "'\(convertedString)'"
                 } catch {
                     print("params conversion to string failed")
                     return nil
@@ -94,7 +97,7 @@ public final class JANetworking {
                     let jsonData = try JSONSerialization.data(withJSONObject: value, options: JSONSerialization.WritingOptions())
                     let convertedString = String(data: jsonData, encoding: String.Encoding.utf8) // the data will be converted to the string
 //                    let stringWithoutQuotes = convertedString?.replacingOccurrences(of: "\"", with: "")
-                    newDictionary[key] = convertedString
+                    newDictionary[key] = "'\(convertedString)'"
                 } catch {
                     print("params conversion to string failed")
                     return nil
