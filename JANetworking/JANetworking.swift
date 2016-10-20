@@ -38,7 +38,11 @@ public final class JANetworking {
         }
     
         // Setup params
-        if let params = resource.params as? [String:String]{
+        var params = resource.params as? [String:String]
+        if params == nil, let anyParams = resource.params {
+            params = convertToStringDictionary(dictionary: anyParams)
+        }
+        if let params = params {
             if resource.method == .GET { 
                 let query = buildQueryString(fromDictionary: params)
                 let baseURL = request.url!.absoluteString
@@ -48,7 +52,6 @@ public final class JANetworking {
                     request.httpBody = jsonParams
                 }
             }
-           
         }
         URLSession.shared.dataTask(with: request as URLRequest) { (data:Data?, response:URLResponse?, error:Error?) in
             // error is nil when request fails. Not nil when the request passes. However even if the request went through, the reponse can be of status code error 400 up or 500 up
@@ -69,6 +72,38 @@ public final class JANetworking {
             }
             
         }.resume()
+    }
+    
+    private static func convertToStringDictionary(dictionary:[String:Any]) -> [String:String]? {
+        var newDictionary:[String:String] = [:]
+        for (key, value) in dictionary {
+            if let value = value as? String {
+                newDictionary[key] = value
+            }else if let value = value as? [String:String] {
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: value, options: JSONSerialization.WritingOptions())
+                    let convertedString = String(data: jsonData, encoding: String.Encoding.utf8) // the data will be converted to the string
+                    let stringWithoutQuotes = convertedString?.replacingOccurrences(of: "\"", with: "")
+                    newDictionary[key] = stringWithoutQuotes
+                } catch {
+                    print("params conversion to string failed")
+                    return nil
+                }
+            } else if let value = value as? [String] {
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: value, options: JSONSerialization.WritingOptions())
+                    let convertedString = String(data: jsonData, encoding: String.Encoding.utf8) // the data will be converted to the string
+                    let stringWithoutQuotes = convertedString?.replacingOccurrences(of: "\"", with: "")
+                    newDictionary[key] = stringWithoutQuotes
+                } catch {
+                    print("params conversion to string failed")
+                    return nil
+                }
+            } else {
+                newDictionary[key] = String(describing: value)
+            }
+        }
+        return newDictionary
     }
     
     private static func buildQueryString(fromDictionary parameters: [String:String]) -> String {
