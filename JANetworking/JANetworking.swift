@@ -83,8 +83,8 @@ public final class JANetworking {
                 do {
                     let jsonData = try JSONSerialization.data(withJSONObject: value, options: JSONSerialization.WritingOptions())
                     let convertedString = String(data: jsonData, encoding: String.Encoding.utf8) // the data will be converted to the string
-                    let stringWithoutQuotes = convertedString?.replacingOccurrences(of: "\"", with: "")
-                    newDictionary[key] = stringWithoutQuotes
+//                    let stringWithoutQuotes = convertedString?.replacingOccurrences(of: "\"", with: "")
+                    newDictionary[key] = convertedString
                 } catch {
                     print("params conversion to string failed")
                     return nil
@@ -93,8 +93,8 @@ public final class JANetworking {
                 do {
                     let jsonData = try JSONSerialization.data(withJSONObject: value, options: JSONSerialization.WritingOptions())
                     let convertedString = String(data: jsonData, encoding: String.Encoding.utf8) // the data will be converted to the string
-                    let stringWithoutQuotes = convertedString?.replacingOccurrences(of: "\"", with: "")
-                    newDictionary[key] = stringWithoutQuotes
+//                    let stringWithoutQuotes = convertedString?.replacingOccurrences(of: "\"", with: "")
+                    newDictionary[key] = convertedString
                 } catch {
                     print("params conversion to string failed")
                     return nil
