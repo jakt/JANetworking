@@ -38,23 +38,28 @@ public final class JANetworking {
         }
     
         // Setup params
-        var params = resource.params as? [String:String]
-        if params == nil, let anyParams = resource.params {
-            params = convertToStringDictionary(dictionary: anyParams)
-        }
-        if let params = params {
-            if resource.method == .GET { 
-                let query = buildQueryString(fromDictionary: params)
+        if let params = resource.params {
+            if resource.method == .GET {
+                var stringParams:[String:String]
+                if let sParams = params as? [String:String] {
+                    stringParams = sParams
+                } else if let sParams = convertToStringDictionary(dictionary: params) {
+                    stringParams = sParams
+                } else {
+                    stringParams = [:]
+                }
+                let query = buildQueryString(fromDictionary: stringParams)
                 let baseURL = request.url!.absoluteString
-                request.url = URL(string: baseURL + query)
+                let url = URL(string: baseURL + query)
+                request.url = url
+                print("GET url: \(url?.absoluteString)")
             } else {
                 if let jsonParams = try? JSONSerialization.data(withJSONObject: params, options: []) {
                     request.httpBody = jsonParams
+                    let convertedString = String(data: jsonParams, encoding: String.Encoding.utf8)
+                    print("POST params string: \(convertedString)")
                 }
             }
-        }
-        if let urlString = request.url?.absoluteString {
-            print(urlString)
         }
         URLSession.shared.dataTask(with: request as URLRequest) { (data:Data?, response:URLResponse?, error:Error?) in
             // error is nil when request fails. Not nil when the request passes. However even if the request went through, the reponse can be of status code error 400 up or 500 up
