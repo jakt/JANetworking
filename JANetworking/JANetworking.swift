@@ -8,11 +8,6 @@
 
 import Foundation
 
-public enum MediaType {
-    case image
-    case gif
-}
-
 public final class JANetworking {
     // Load json request
     public static func loadJSON<A>(resource: JANetworkingResource<A>, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){

@@ -8,6 +8,12 @@
 
 import UIKit
 
+
+public enum MediaType {
+    case image
+    case gif
+}
+
 public final class JAImageManager: NSObject {
     static let sharedManager = JAImageManager()
     var library:Dictionary<String,UIImage> = Dictionary<String,UIImage>()
@@ -37,7 +43,7 @@ public final class JAImageManager: NSObject {
     }
     
     // MARK: Image file storage
-    private static func writeImageToFile(imageData:Data, imageURL:String) {
+    private static func writeMediaToFile(imageData:Data, imageURL:String) {
         let imageDirectory = imageDirectoryPath
         do {
             // add directory if it doesn't exist
@@ -67,16 +73,12 @@ public final class JAImageManager: NSObject {
     }
     
     public static func removeImageAtUrl(url:String) -> Bool {
-        if let imageURL = locationForImageAtURL(url) {
-            do {
-                try FileManager.default.removeItem(atPath: imageURL)
-                return true
-            } catch let fileError{
-                print(fileError)
-            }
-        } else {
-            // Could no parse image url
-            return false
+        let imageURL = locationForImageAtURL(url)
+        do {
+            try FileManager.default.removeItem(atPath: imageURL)
+            return true
+        } catch let fileError{
+            print(fileError)
         }
         
         return false
@@ -92,7 +94,7 @@ public final class JAImageManager: NSObject {
         return false
     }
     
-    private static func locationForImageAtURL(_ url:String) -> String? {
+    private static func locationForImageAtURL(_ url:String) -> String {
         let imageDirectory = imageDirectoryPath
         var saveName = url
         saveName = saveName.replacingOccurrences(of: "/", with: "")
@@ -109,7 +111,7 @@ public final class JAImageManager: NSObject {
     
     // MARK: Server calls for images
     
-    private static func fetchImageDataWithURL(imageURL:String, completion:@escaping (Data?, JANetworkingError?) -> ()) {
+    private static func fetchMediaDataWithURL(imageURL:String, completion:@escaping (Data?, JANetworkingError?) -> ()) {
         URLSession.shared.dataTask(with: URL(string: imageURL)!, completionHandler: { (data, response, error) in
             if let errorObj = error {
                 let networkError = JANetworkingError(error: errorObj as Error)
@@ -166,9 +168,9 @@ public final class JAImageManager: NSObject {
                     completion(image, nil)
                 })
             } else {
-                JAImageManager.fetchImageDataWithURL(imageURL: url, completion: { (imageData:Data?, error:JANetworkingError?) in
+                JAImageManager.fetchMediaDataWithURL(imageURL: url, completion: { (imageData:Data?, error:JANetworkingError?) in
                     var image:UIImage?
-                    if let localURL  = localURL, let imageData = imageData {
+                    if let imageData = imageData {
                         switch type {
                         case .image:
                             image = UIImage(data: imageData)
@@ -176,12 +178,35 @@ public final class JAImageManager: NSObject {
                             image = UIImage.gifWithData(data: imageData)
                         }
                         if let _ = image , JANetworkingConfiguration.sharedConfiguration.automaticallySaveImageToDisk {
-                            JAImageManager.writeImageToFile(imageData: imageData, imageURL: localURL)
+                            JAImageManager.writeMediaToFile(imageData: imageData, imageURL: localURL)
                         }
                     }
                     
                     DispatchQueue.main.async(execute: {
                         completion(image, error)
+                    })
+                })
+            }
+        }
+    }
+    
+    // Use this method for saving and loading data files that aren't UIImage files. Returns the local path for the newly created file.
+    public static func loadGenericMedia(url: String, completion:@escaping (String?, JANetworkingError?) -> ()){
+        // Check local disk for image
+        let localUrl = locationForImageAtURL(url)
+        DispatchQueue.global(qos: .background).async {
+            if FileManager.default.fileExists(atPath: localUrl) {
+                DispatchQueue.main.async(execute: {
+                    completion(localUrl, nil)
+                })
+            } else {
+                JAImageManager.fetchMediaDataWithURL(imageURL: url, completion: { (data:Data?, error:JANetworkingError?) in
+                    if let data = data {
+                        JAImageManager.writeMediaToFile(imageData: data, imageURL: localUrl)
+                    }
+                    
+                    DispatchQueue.main.async(execute: {
+                        completion(localUrl, error)
                     })
                 })
             }
