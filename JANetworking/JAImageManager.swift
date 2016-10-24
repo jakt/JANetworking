@@ -44,7 +44,7 @@ public final class JAImageManager: NSObject {
     
     // MARK: Image file storage
     private static func writeMediaToFile(imageData:Data, imageURL:String) {
-        let imageDirectory = imageDirectoryPath
+        let imageDirectory = mediaDirectoryPath
         do {
             // add directory if it doesn't exist
             if !(imageDirectory as NSURL).checkResourceIsReachableAndReturnError(nil) {
@@ -72,8 +72,8 @@ public final class JAImageManager: NSObject {
         return nil
     }
     
-    public static func removeImageAtUrl(url:String) -> Bool {
-        let imageURL = locationForImageAtURL(url)
+    public static func removeMediaAtUrl(url:String) -> Bool {
+        let imageURL = locationForMediaAtURL(url)
         do {
             try FileManager.default.removeItem(atPath: imageURL)
             return true
@@ -84,9 +84,9 @@ public final class JAImageManager: NSObject {
         return false
     }
     
-    public static func removeAllCachedImages() -> Bool {
+    public static func removeAllCachedMedia() -> Bool {
         do {
-            try FileManager.default.removeItem(at: imageDirectoryPath)
+            try FileManager.default.removeItem(at: mediaDirectoryPath)
             return true
         } catch let fileError {
             print(fileError)
@@ -94,8 +94,8 @@ public final class JAImageManager: NSObject {
         return false
     }
     
-    private static func locationForImageAtURL(_ url:String) -> String {
-        let imageDirectory = imageDirectoryPath
+    private static func locationForMediaAtURL(_ url:String) -> String {
+        let imageDirectory = mediaDirectoryPath
         var saveName = url
         saveName = saveName.replacingOccurrences(of: "/", with: "")
         let imageURL = imageDirectory.appendingPathComponent("\(saveName)").path
@@ -103,7 +103,7 @@ public final class JAImageManager: NSObject {
         return imageURL
     }
     
-    private static var imageDirectoryPath:URL {
+    private static var mediaDirectoryPath:URL {
         let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let imageDirectory = documentsURL.appendingPathComponent("image_cache")
         return imageDirectory
@@ -162,7 +162,7 @@ public final class JAImageManager: NSObject {
     static func loadImageMedia(url: String, type:MediaType, completion:@escaping (UIImage?, JANetworkingError?) -> ()){
         // Check local disk for image
         DispatchQueue.global(qos: .background).async {
-            let localURL = locationForImageAtURL(url)
+            let localURL = locationForMediaAtURL(url)
             if let image = localImageFileForURL(localURL: localURL, type: type) {
                 DispatchQueue.main.async(execute: {
                     completion(image, nil)
@@ -193,7 +193,7 @@ public final class JAImageManager: NSObject {
     // Use this method for saving and loading data files that aren't UIImage files. Returns the local path for the newly created file.
     public static func loadGenericMedia(url: String, completion:@escaping (String?, JANetworkingError?) -> ()){
         // Check local disk for image
-        let localUrl = locationForImageAtURL(url)
+        let localUrl = locationForMediaAtURL(url)
         DispatchQueue.global(qos: .background).async {
             if FileManager.default.fileExists(atPath: localUrl) {
                 DispatchQueue.main.async(execute: {

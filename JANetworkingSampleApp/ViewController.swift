@@ -98,6 +98,15 @@ class ViewController: UIViewController {
         JAImageManager.loadGIF(url: "http://4.bp.blogspot.com/-uhjF2kC3tFc/U_r3myvwzHI/AAAAAAAACiw/tPQ2XOXFYKY/s1600/Circles-3.gif") { (image, error) in
             self.imageView2.image = image
         }
+        
+        let url = "https://rs-exchange-dev.s3.amazonaws.com:443/asset/asset/4963b762-d5e2-4516-915a-df4b90bc652a/e89e882cf0e74f5dbd8f9445cbf18b94.pdf"
+        JAImageManager.loadGenericMedia(url: url, completion: { (localpath:String?, error:JANetworkingError?) in
+            if let err = error {
+                print(err.statusCode)
+            } else {
+                print(localpath)
+            }
+        })
     }
 
     override func didReceiveMemoryWarning() {
