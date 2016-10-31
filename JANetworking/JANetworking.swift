@@ -47,18 +47,15 @@ public final class JANetworking {
                 let baseURL = request.url!.absoluteString
                 let url = URL(string: baseURL + query)
                 request.url = url
-                print("GET url: \(url?.absoluteString)")
             } else {
                 if let jsonParams = try? JSONSerialization.data(withJSONObject: params, options: []) {
                     request.httpBody = jsonParams
                     let convertedString = String(data: jsonParams, encoding: String.Encoding.utf8)
-                    print("POST params string: \(convertedString)")
                 }
             }
         }
         URLSession.shared.dataTask(with: request as URLRequest) { (data:Data?, response:URLResponse?, error:Error?) in
             // error is nil when request fails. Not nil when the request passes. However even if the request went through, the reponse can be of status code error 400 up or 500 up
-            print("\n\(request.httpMethod) -- \(request.url!.absoluteString)")
             if let errorObj = error {
                 DispatchQueue.main.async(execute: {
                     let networkError = JANetworkingError(error: errorObj)
