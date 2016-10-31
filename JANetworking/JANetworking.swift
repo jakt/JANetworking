@@ -50,7 +50,7 @@ public final class JANetworking {
             } else {
                 if let jsonParams = try? JSONSerialization.data(withJSONObject: params, options: []) {
                     request.httpBody = jsonParams
-                    let convertedString = String(data: jsonParams, encoding: String.Encoding.utf8)
+//                    let convertedString = String(data: jsonParams, encoding: String.Encoding.utf8)
                 }
             }
         }
