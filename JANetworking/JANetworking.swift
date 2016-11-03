@@ -6,10 +6,18 @@
 //  Copyright © 2016 JAKT. All rights reserved.
 //
 
+protocol JANetworkDelegate: class {
+    func updateToken(completion:((Bool)->Void))
+    func unauthorizedCallAttempted()
+}
+
 import Foundation
 
 public final class JANetworking {
     // Load json request
+    
+    weak static var delegate:JANetworkDelegate?
+    
     public static func loadJSON<A>(resource: JANetworkingResource<A>, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
         let request = NSMutableURLRequest(url: resource.url as URL)
         request.httpMethod = resource.method.rawValue
@@ -21,17 +29,21 @@ public final class JANetworking {
             request.addValue(value, forHTTPHeaderField: key)
         }
         
-        // Add the JSON Web Token if we have it
-        if let token = JANetworkingConfiguration.token {
-            request.addValue("JWT \(token)", forHTTPHeaderField: "Authorization")
-        }
-        
         if let headers = resource.headers {
             for (key, value) in headers {
                 request.addValue(value, forHTTPHeaderField: key)
             }
         }
     
+        // Add the JSON Web Token if we have it
+        if let token = JANetworkingConfiguration.token {
+            request.addValue("JWT \(token)", forHTTPHeaderField: "Authorization")
+        }
+        
+        createServerCall(resource: resource, request:request, retryCount:0, completion: completion)
+    }
+    
+    private static func createServerCall<A>(resource: JANetworkingResource<A>, request: NSMutableURLRequest, retryCount:Int, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
         // Setup params
         if let params = resource.params {
             if resource.method == .GET {
@@ -59,7 +71,23 @@ public final class JANetworking {
             if let errorObj = error {
                 DispatchQueue.main.async(execute: {
                     let networkError = JANetworkingError(error: errorObj)
-                    completion(nil, networkError)
+                    if networkError.statusCode == 401 {
+                        if retryCount <= JANetworkingConfiguration.unauthorizedRetryLimit, let delegate = delegate {
+                            delegate.updateToken(completion: { (success:Bool) in
+                                if success {
+                                    let count = retryCount + 1
+                                    createServerCall(resource: resource, request: request, retryCount: count, completion: completion)
+                                } else {
+                                    completion(nil, networkError)
+                                }
+                            })
+                        } else {
+                            delegate?.unauthorizedCallAttempted()
+                            completion(nil, networkError)
+                        }
+                    } else {
+                        completion(nil, networkError)
+                    }
                 })
             }else{
                 DispatchQueue.main.async(execute: {
@@ -67,7 +95,23 @@ public final class JANetworking {
                     // Ensure that there is no error in the reponse and in the server
                     let networkError = JANetworkingError(responseError: response, serverError: JANetworkingError.parseServerError(data: data))
                     let results = data.flatMap(resource.parse)
-                    completion(results, networkError)
+                    if networkError?.statusCode == 401 {
+                        if retryCount <= JANetworkingConfiguration.unauthorizedRetryLimit, let delegate = delegate {
+                            delegate.updateToken(completion: { (success:Bool) in
+                                if success {
+                                    let count = retryCount + 1
+                                    createServerCall(resource: resource, request: request, retryCount: count, completion: completion)
+                                } else {
+                                    completion(results, networkError)
+                                }
+                            })
+                        } else {
+                            delegate?.unauthorizedCallAttempted()
+                            completion(results, networkError)
+                        }
+                    } else {
+                        completion(results, networkError)
+                    }
                 })
             }
             

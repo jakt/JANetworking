@@ -22,6 +22,7 @@ public final class JANetworkingConfiguration {
     
     public static let sharedConfiguration = JANetworkingConfiguration()
     public var automaticallySaveImageToDisk = true
+    public static var unauthorizedRetryLimit:Int = 1
 
     public private(set) var configurationHeaders = ["Content-Type":"application/json",
                                                     "Accept":"application/json"]

@@ -161,9 +161,15 @@ public final class JAImageManager: NSObject {
     // Method called when image not accessible in local memory library
     static func loadImageMedia(url: String, type:MediaType, completion:@escaping (UIImage?, JANetworkingError?) -> ()){
         // Check local disk for image
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global(qos: .default).async {
             let localURL = locationForMediaAtURL(url)
             if let image = localImageFileForURL(localURL: localURL, type: type) {
+                // Make a trivial (1x1) graphics context, and draw the image into it
+                UIGraphicsBeginImageContext(CGSize(width: 1, height: 1))
+                let context = UIGraphicsGetCurrentContext()
+                context?.draw(image.cgImage!, in: CGRect(x: 0, y: 0, width: 1, height: 1))
+                UIGraphicsEndImageContext()
+                
                 DispatchQueue.main.async(execute: {
                     completion(image, nil)
                 })

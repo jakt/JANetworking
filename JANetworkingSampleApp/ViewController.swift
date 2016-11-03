@@ -90,13 +90,19 @@ class ViewController: UIViewController {
 //        https://www.clicktorelease.com/code/gif/1.gif
 //        https://static.pexels.com/photos/8700/wall-animal-dog-pet.jpg
 //        https://rs-exchange-staging.s3.amazonaws.com:443/asset/asset/86/15/51cd59696d975238ea37d195c540.gif
-        imageView.downloadImage(url: "https://static.pexels.com/photos/8700/wall-animal-dog-pet.jpg", placeholder: placeholder)
-//        imageView.downloadImage("http://www.flooringvillage.co.uk/ekmps/shops/flooringvillage/images/request-a-sample--547-p.jpg", placeholder: placeholder)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            self.imageView.image = #imageLiteral(resourceName: "placeholder")
+            self.imageView.setNeedsDisplay()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                self.imageView.downloadImage(url: "https://static.pexels.com/photos/3247/nature-forest-industry-rails.jpg", placeholder: placeholder)
+            }
+//            imageView.downloadImage(url: "http://www.flooringvillage.co.uk/ekmps/shops/flooringvillage/images/request-a-sample--547-p.jpg", placeholder: placeholder)
+        }
         
         // Normal download image
 //        http://4.bp.blogspot.com/-uhjF2kC3tFc/U_r3myvwzHI/AAAAAAAACiw/tPQ2XOXFYKY/s1600/Circles-3.gif
-        JAImageManager.loadGIF(url: "http://4.bp.blogspot.com/-uhjF2kC3tFc/U_r3myvwzHI/AAAAAAAACiw/tPQ2XOXFYKY/s1600/Circles-3.gif") { (image, error) in
-            self.imageView2.image = image
+        JAImageManager.loadGIF(url: "https://rs-exchange-staging.s3.amazonaws.com:443/asset/asset/f3fa401f-2c82-486a-876e-693bf7e21894/5331c8bbfdb44a79a95682570228ed5d.gif") { (image, error) in
+//            self.imageView2.image = image
         }
         
         let url = "https://rs-exchange-dev.s3.amazonaws.com:443/asset/asset/4963b762-d5e2-4516-915a-df4b90bc652a/e89e882cf0e74f5dbd8f9445cbf18b94.pdf"
