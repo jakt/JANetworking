@@ -34,16 +34,16 @@ public final class JANetworking {
                 request.addValue(value, forHTTPHeaderField: key)
             }
         }
-    
-        // Add the JSON Web Token if we have it
-        if let token = JANetworkingConfiguration.token {
-            request.addValue("JWT \(token)", forHTTPHeaderField: "Authorization")
-        }
         
         createServerCall(resource: resource, request:request, retryCount:0, completion: completion)
     }
     
     private static func createServerCall<A>(resource: JANetworkingResource<A>, request: NSMutableURLRequest, retryCount:Int, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
+        // Add the JSON Web Token if we have it
+        if let token = JANetworkingConfiguration.token {
+            request.addValue("JWT \(token)", forHTTPHeaderField: "Authorization")
+        }
+        
         // Setup params
         if let params = resource.params {
             if resource.method == .GET {
