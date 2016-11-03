@@ -12,6 +12,7 @@
 		745BE32B1D95AA400014BEC2 /* JANetworking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDD253CE1D2C16A5009E635F /* JANetworking.framework */; };
 		745BE32C1D95AA400014BEC2 /* JANetworking.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CDD253CE1D2C16A5009E635F /* JANetworking.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		745BE3311D99B8AF0014BEC2 /* JAImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745BE3301D99B8AF0014BEC2 /* JAImageManager.swift */; };
+		74B0898D1DCBF0E0007CFCFA /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74B0898C1DCBF0E0007CFCFA /* User.swift */; };
 		CDD253D21D2C16A5009E635F /* JANetworking.h in Headers */ = {isa = PBXBuildFile; fileRef = CDD253D11D2C16A5009E635F /* JANetworking.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CDD253D91D2C16A5009E635F /* JANetworking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDD253CE1D2C16A5009E635F /* JANetworking.framework */; };
 		CDD253DE1D2C16A5009E635F /* JANetworkingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD253DD1D2C16A5009E635F /* JANetworkingTests.swift */; };
@@ -61,6 +62,7 @@
 		45AD78291D357174007E7CFF /* JANetworkingConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JANetworkingConfiguration.swift; sourceTree = "<group>"; };
 		7435F96D1D66173E00C55872 /* Gif.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gif.swift; sourceTree = "<group>"; };
 		745BE3301D99B8AF0014BEC2 /* JAImageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JAImageManager.swift; sourceTree = "<group>"; };
+		74B0898C1DCBF0E0007CFCFA /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		CDD253CE1D2C16A5009E635F /* JANetworking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JANetworking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDD253D11D2C16A5009E635F /* JANetworking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JANetworking.h; sourceTree = "<group>"; };
 		CDD253D31D2C16A5009E635F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -165,6 +167,7 @@
 			children = (
 				CDD253EC1D2C193C009E635F /* Mock Models */,
 				CDD253F51D2C1DEF009E635F /* AppDelegate.swift */,
+				74B0898C1DCBF0E0007CFCFA /* User.swift */,
 				CDD253F71D2C1DEF009E635F /* ViewController.swift */,
 				CDD253F91D2C1DEF009E635F /* Main.storyboard */,
 				CDD253FC1D2C1DEF009E635F /* Assets.xcassets */,
@@ -342,6 +345,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74B0898D1DCBF0E0007CFCFA /* User.swift in Sources */,
 				CDD254131D2C4873009E635F /* Post.swift in Sources */,
 				CDD253F81D2C1DEF009E635F /* ViewController.swift in Sources */,
 				CDD253F61D2C1DEF009E635F /* AppDelegate.swift in Sources */,

@@ -19,6 +19,10 @@ public final class JANetworking {
     weak public static var delegate:JANetworkDelegate?
     
     public static func loadJSON<A>(resource: JANetworkingResource<A>, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
+        createServerCall(resource: resource, retryCount:0, completion: completion)
+    }
+    
+    private static func createServerCall<A>(resource: JANetworkingResource<A>, retryCount:Int, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
         let request = NSMutableURLRequest(url: resource.url as URL)
         request.httpMethod = resource.method.rawValue
         
@@ -33,15 +37,6 @@ public final class JANetworking {
             for (key, value) in headers {
                 request.addValue(value, forHTTPHeaderField: key)
             }
-        }
-        
-        createServerCall(resource: resource, request:request, retryCount:0, completion: completion)
-    }
-    
-    private static func createServerCall<A>(resource: JANetworkingResource<A>, request: NSMutableURLRequest, retryCount:Int, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
-        // Add the JSON Web Token if we have it
-        if let token = JANetworkingConfiguration.token {
-            request.addValue("JWT \(token)", forHTTPHeaderField: "Authorization")
         }
         
         // Setup params
@@ -62,10 +57,16 @@ public final class JANetworking {
             } else {
                 if let jsonParams = try? JSONSerialization.data(withJSONObject: params, options: []) {
                     request.httpBody = jsonParams
-//                    let convertedString = String(data: jsonParams, encoding: String.Encoding.utf8)
+                    //                    let convertedString = String(data: jsonParams, encoding: String.Encoding.utf8)
                 }
             }
         }
+        
+        // Add the JSON Web Token if we have it
+        if let token = JANetworkingConfiguration.token {
+            request.addValue("JWT \(token)", forHTTPHeaderField: "Authorization")
+        }
+        
         URLSession.shared.dataTask(with: request as URLRequest) { (data:Data?, response:URLResponse?, error:Error?) in
             // error is nil when request fails. Not nil when the request passes. However even if the request went through, the reponse can be of status code error 400 up or 500 up
             if let errorObj = error {
@@ -80,7 +81,7 @@ public final class JANetworking {
                             delegate.updateToken(completion: {(success:Bool) in
                                 if success {
                                     let count = retryCount + 1
-                                    createServerCall(resource: resource, request: request, retryCount: count, completion: completion)
+                                    createServerCall(resource: resource, retryCount: count, completion: completion)
                                 } else {
                                     completion(nil, networkError)
                                 }
@@ -104,7 +105,7 @@ public final class JANetworking {
                             delegate.updateToken(completion: { (success:Bool) in
                                 if success {
                                     let count = retryCount + 1
-                                    createServerCall(resource: resource, request: request, retryCount: count, completion: completion)
+                                    createServerCall(resource: resource, retryCount: count, completion: completion)
                                 } else {
                                     completion(results, networkError)
                                 }
