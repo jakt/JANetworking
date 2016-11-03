@@ -71,7 +71,11 @@ public final class JANetworking {
             if let errorObj = error {
                 DispatchQueue.main.async(execute: {
                     let networkError = JANetworkingError(error: errorObj)
-                    if networkError.statusCode == 401 {
+                    var tokenInvalid = networkError.statusCode == 401
+                    if let errorData = networkError.errorData, let errorObj = errorData.first, let msg = errorObj.message, msg.contains("token") {
+                        tokenInvalid = true
+                    }
+                    if tokenInvalid {
                         if retryCount <= JANetworkingConfiguration.unauthorizedRetryLimit, let delegate = delegate {
                             delegate.updateToken(completion: {(success:Bool) in
                                 if success {
