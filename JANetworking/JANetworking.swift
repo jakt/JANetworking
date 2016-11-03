@@ -83,6 +83,7 @@ public final class JANetworking {
                                     let count = retryCount + 1
                                     createServerCall(resource: resource, retryCount: count, completion: completion)
                                 } else {
+                                    self.delegate?.unauthorizedCallAttempted()
                                     completion(nil, networkError)
                                 }
                             })
@@ -107,6 +108,7 @@ public final class JANetworking {
                                     let count = retryCount + 1
                                     createServerCall(resource: resource, retryCount: count, completion: completion)
                                 } else {
+                                    self.delegate?.unauthorizedCallAttempted()
                                     completion(results, networkError)
                                 }
                             })

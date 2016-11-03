@@ -81,13 +81,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         JANetworkingConfiguration.token = nil
         
         JANetworking.loadJSON(resource: User.login(email: username, password: password), completion: { (data, error) in
-            if error == nil {
-                print("success")
-                completion?(true)
-            } else {
-                print("error")
-                completion?(false)
-            }
+//            if error == nil {
+//                print("success")
+//                completion?(true)
+//            } else {
+//                print("error")
+//                completion?(false)
+//            }
+            completion?(false)
         })
     }
     
