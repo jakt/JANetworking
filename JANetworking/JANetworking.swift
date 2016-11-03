@@ -7,7 +7,7 @@
 //
 
 public protocol JANetworkDelegate: class {
-    func updateToken(completion:((Bool)->Void))
+    func updateToken(completion: @escaping ((Bool)->Void))
     func unauthorizedCallAttempted()
 }
 
@@ -73,7 +73,7 @@ public final class JANetworking {
                     let networkError = JANetworkingError(error: errorObj)
                     if networkError.statusCode == 401 {
                         if retryCount <= JANetworkingConfiguration.unauthorizedRetryLimit, let delegate = delegate {
-                            delegate.updateToken(completion: { (success:Bool) in
+                            delegate.updateToken(completion: {(success:Bool) in
                                 if success {
                                     let count = retryCount + 1
                                     createServerCall(resource: resource, request: request, retryCount: count, completion: completion)
