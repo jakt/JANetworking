@@ -6,7 +6,7 @@
 //  Copyright © 2016 JAKT. All rights reserved.
 //
 
-protocol JANetworkDelegate: class {
+public protocol JANetworkDelegate: class {
     func updateToken(completion:((Bool)->Void))
     func unauthorizedCallAttempted()
 }
@@ -16,7 +16,7 @@ import Foundation
 public final class JANetworking {
     // Load json request
     
-    weak static var delegate:JANetworkDelegate?
+    weak public static var delegate:JANetworkDelegate?
     
     public static func loadJSON<A>(resource: JANetworkingResource<A>, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
         let request = NSMutableURLRequest(url: resource.url as URL)
