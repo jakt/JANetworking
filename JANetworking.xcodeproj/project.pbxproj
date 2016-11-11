@@ -10,6 +10,8 @@
 		45AD782A1D357174007E7CFF /* JANetworkingConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AD78291D357174007E7CFF /* JANetworkingConfiguration.swift */; };
 		7435F96E1D66173E00C55872 /* Gif.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7435F96D1D66173E00C55872 /* Gif.swift */; };
 		744B0F401DD66A1000999FA9 /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744B0F3F1DD66A1000999FA9 /* Post.swift */; };
+		744B0F451DD686A700999FA9 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744B0F431DD686A700999FA9 /* Reachability.swift */; };
+		744B0F461DD686A700999FA9 /* JAConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744B0F441DD686A700999FA9 /* JAConnectivityManager.swift */; };
 		745BE32B1D95AA400014BEC2 /* JANetworking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDD253CE1D2C16A5009E635F /* JANetworking.framework */; };
 		745BE32C1D95AA400014BEC2 /* JANetworking.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CDD253CE1D2C16A5009E635F /* JANetworking.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		745BE3311D99B8AF0014BEC2 /* JAImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745BE3301D99B8AF0014BEC2 /* JAImageManager.swift */; };
@@ -63,6 +65,8 @@
 		45AD78291D357174007E7CFF /* JANetworkingConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JANetworkingConfiguration.swift; sourceTree = "<group>"; };
 		7435F96D1D66173E00C55872 /* Gif.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gif.swift; sourceTree = "<group>"; };
 		744B0F3F1DD66A1000999FA9 /* Post.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
+		744B0F431DD686A700999FA9 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
+		744B0F441DD686A700999FA9 /* JAConnectivityManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JAConnectivityManager.swift; sourceTree = "<group>"; };
 		745BE3301D99B8AF0014BEC2 /* JAImageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JAImageManager.swift; sourceTree = "<group>"; };
 		74B0898C1DCBF0E0007CFCFA /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		CDD253CE1D2C16A5009E635F /* JANetworking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JANetworking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -142,6 +146,8 @@
 				CDD254051D2C39B3009E635F /* JANetworkingError.swift */,
 				7435F96D1D66173E00C55872 /* Gif.swift */,
 				745BE3301D99B8AF0014BEC2 /* JAImageManager.swift */,
+				744B0F431DD686A700999FA9 /* Reachability.swift */,
+				744B0F441DD686A700999FA9 /* JAConnectivityManager.swift */,
 			);
 			path = JANetworking;
 			sourceTree = "<group>";
@@ -327,10 +333,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				744B0F451DD686A700999FA9 /* Reachability.swift in Sources */,
 				CDD253E91D2C16D0009E635F /* JANetworking.swift in Sources */,
 				45AD782A1D357174007E7CFF /* JANetworkingConfiguration.swift in Sources */,
 				CDD254061D2C39B3009E635F /* JANetworkingError.swift in Sources */,
 				745BE3311D99B8AF0014BEC2 /* JAImageManager.swift in Sources */,
+				744B0F461DD686A700999FA9 /* JAConnectivityManager.swift in Sources */,
 				CDD253EB1D2C171C009E635F /* JANetworkingResource.swift in Sources */,
 				7435F96E1D66173E00C55872 /* Gif.swift in Sources */,
 			);
