@@ -27,6 +27,7 @@ public final class JANetworking {
     }
     
     private static func createServerCall<A>(resource: JANetworkingResource<A>, useNextPage:Bool, retryCount:Int, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true
         // Check if theres a valid nextPage url
         var nextUrl:URL?
         if useNextPage {
@@ -93,6 +94,7 @@ public final class JANetworking {
         
         print(request.url)
         URLSession.shared.dataTask(with: request as URLRequest) { (data:Data?, response:URLResponse?, error:Error?) in
+            UIApplication.shared.isNetworkActivityIndicatorVisible = false
             // error is nil when request fails. Not nil when the request passes. However even if the request went through, the reponse can be of status code error 400 up or 500 up
             if let errorObj = error {
                 DispatchQueue.main.async(execute: {
