@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		45AD782A1D357174007E7CFF /* JANetworkingConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AD78291D357174007E7CFF /* JANetworkingConfiguration.swift */; };
 		7435F96E1D66173E00C55872 /* Gif.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7435F96D1D66173E00C55872 /* Gif.swift */; };
+		744B0F401DD66A1000999FA9 /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744B0F3F1DD66A1000999FA9 /* Post.swift */; };
 		745BE32B1D95AA400014BEC2 /* JANetworking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDD253CE1D2C16A5009E635F /* JANetworking.framework */; };
 		745BE32C1D95AA400014BEC2 /* JANetworking.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CDD253CE1D2C16A5009E635F /* JANetworking.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		745BE3311D99B8AF0014BEC2 /* JAImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745BE3301D99B8AF0014BEC2 /* JAImageManager.swift */; };
@@ -24,7 +25,7 @@
 		CDD253FD1D2C1DEF009E635F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CDD253FC1D2C1DEF009E635F /* Assets.xcassets */; };
 		CDD254001D2C1DEF009E635F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CDD253FE1D2C1DEF009E635F /* LaunchScreen.storyboard */; };
 		CDD254061D2C39B3009E635F /* JANetworkingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD254051D2C39B3009E635F /* JANetworkingError.swift */; };
-		CDD254131D2C4873009E635F /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD254121D2C4873009E635F /* Post.swift */; };
+		CDD254131D2C4873009E635F /* PostTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD254121D2C4873009E635F /* PostTest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +62,7 @@
 /* Begin PBXFileReference section */
 		45AD78291D357174007E7CFF /* JANetworkingConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JANetworkingConfiguration.swift; sourceTree = "<group>"; };
 		7435F96D1D66173E00C55872 /* Gif.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gif.swift; sourceTree = "<group>"; };
+		744B0F3F1DD66A1000999FA9 /* Post.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
 		745BE3301D99B8AF0014BEC2 /* JAImageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JAImageManager.swift; sourceTree = "<group>"; };
 		74B0898C1DCBF0E0007CFCFA /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		CDD253CE1D2C16A5009E635F /* JANetworking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JANetworking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -79,7 +81,7 @@
 		CDD253FF1D2C1DEF009E635F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CDD254011D2C1DEF009E635F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CDD254051D2C39B3009E635F /* JANetworkingError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JANetworkingError.swift; sourceTree = "<group>"; };
-		CDD254121D2C4873009E635F /* Post.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Post.swift; path = JANetworkingSampleApp/Post.swift; sourceTree = SOURCE_ROOT; };
+		CDD254121D2C4873009E635F /* PostTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PostTest.swift; path = JANetworkingSampleApp/PostTest.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,7 +158,7 @@
 		CDD253EC1D2C193C009E635F /* Mock Models */ = {
 			isa = PBXGroup;
 			children = (
-				CDD254121D2C4873009E635F /* Post.swift */,
+				CDD254121D2C4873009E635F /* PostTest.swift */,
 			);
 			name = "Mock Models";
 			path = ../JANetworkingTests;
@@ -168,6 +170,7 @@
 				CDD253EC1D2C193C009E635F /* Mock Models */,
 				CDD253F51D2C1DEF009E635F /* AppDelegate.swift */,
 				74B0898C1DCBF0E0007CFCFA /* User.swift */,
+				744B0F3F1DD66A1000999FA9 /* Post.swift */,
 				CDD253F71D2C1DEF009E635F /* ViewController.swift */,
 				CDD253F91D2C1DEF009E635F /* Main.storyboard */,
 				CDD253FC1D2C1DEF009E635F /* Assets.xcassets */,
@@ -346,9 +349,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				74B0898D1DCBF0E0007CFCFA /* User.swift in Sources */,
-				CDD254131D2C4873009E635F /* Post.swift in Sources */,
+				CDD254131D2C4873009E635F /* PostTest.swift in Sources */,
 				CDD253F81D2C1DEF009E635F /* ViewController.swift in Sources */,
 				CDD253F61D2C1DEF009E635F /* AppDelegate.swift in Sources */,
+				744B0F401DD66A1000999FA9 /* Post.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

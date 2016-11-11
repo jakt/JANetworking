@@ -20,10 +20,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         // Create CoreData context
         
-        // Setup for JANetworking
-        JANetworkingConfiguration.setBaseURL(development: "https://rs-exchange-dev.herokuapp.com/api", staging: "https://rs-exchange-staging.herokuapp.com/api", production: "https://rs-exchange-live.herokuapp.com/api")
-        JANetworkingConfiguration.set(environment: .staging)
-        
+//        // Setup for JANetworking
+//        JANetworkingConfiguration.setBaseURL(development: "https://rs-exchange-dev.herokuapp.com/api", staging: "https://rs-exchange-staging.herokuapp.com/api", production: "https://rs-exchange-live.herokuapp.com/api")
+//        JANetworkingConfiguration.set(environment: .staging)
+//        
         JANetworkingConfiguration.setLoadToken { () -> (String?) in
             return UserDefaults.standard.object(forKey: "token") as? String
         }
@@ -31,22 +31,50 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         JANetworkingConfiguration.setSaveToken { (token) in
             UserDefaults.standard.set(token, forKey: "token")
         }
+//
+//        JANetworkingConfiguration.unauthorizedRetryLimit = 1
+//        JANetworking.delegate = self
+//        
+//        //        refreshToken(completion:nil)
+//        
+//        // FOR TESTING, SET THE TOKEN TO AN OLD, INVALID TOKEN AND SEE IF JANETWORKING REFRESHES THE TOKEN CORRECTLY
+//        JANetworkingConfiguration.token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiYjNlN2RmNGUtY2E0My00YTk5LTk3OWQtNGI5MWNkOGVhNzc3IiwiZW1haWwiOiJ1QHUuY29tIiwiZXhwIjoxNDc4MjA4MjU4LCJ1c2VybmFtZSI6InVAdS5jb20iLCJvcmlnX2lhdCI6MTQ3ODIwNzM4M30.3XTUV7T2LzpyR4LVy5Kv--ICXfIjN4hvAV-apBNOUqo"
+//        
+//        JANetworking.loadJSON(resource: User.userDetails()) { (data, error) in
+//            if error == nil {
+//                print("success")
+//            } else {
+//                print("error")
+//            }
+//        }
+
+        
+        
+        
+        //Setup for JANetworking
+        JANetworkingConfiguration.setBaseURL(development: "https://rdv-development.herokuapp.com/api", staging: "https://rdv-development.herokuapp.com/api", production: "")
+        JANetworkingConfiguration.set(environment: .development)
         
         JANetworkingConfiguration.unauthorizedRetryLimit = 1
         JANetworking.delegate = self
         
-        //        refreshToken(completion:nil)
-        
-        // FOR TESTING, SET THE TOKEN TO AN OLD, INVALID TOKEN AND SEE IF JANETWORKING REFRESHES THE TOKEN CORRECTLY
-        JANetworkingConfiguration.token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiYjNlN2RmNGUtY2E0My00YTk5LTk3OWQtNGI5MWNkOGVhNzc3IiwiZW1haWwiOiJ1QHUuY29tIiwiZXhwIjoxNDc4MjA4MjU4LCJ1c2VybmFtZSI6InVAdS5jb20iLCJvcmlnX2lhdCI6MTQ3ODIwNzM4M30.3XTUV7T2LzpyR4LVy5Kv--ICXfIjN4hvAV-apBNOUqo"
-        
-        JANetworking.loadJSON(resource: User.userDetails()) { (data, error) in
+        let resource = Post.postOfType(.now)
+        JANetworking.loadPagedJSON(resource: resource) { (data, error) in
             if error == nil {
                 print("success")
+                JANetworking.loadPagedJSON(resource: resource) { (data, error) in
+                    if error == nil {
+                        print("success")
+                    } else {
+                        print("error")
+                    }
+                }
             } else {
                 print("error")
             }
         }
+        
+        
         
         return true
     }
@@ -68,19 +96,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func refreshToken(completion:((Bool)->Void)?) {
         // Auto log user in using the user credential saved in locksmith
-        let username = "u@u.com"
-        let password = "Jakt456!"
-        JANetworkingConfiguration.token = nil
-        
-        JANetworking.loadJSON(resource: User.login(email: username, password: password), completion: { (data, error) in
-            if error == nil {
-                print("success")
-                completion?(true)
-            } else {
-                print("error")
-                completion?(false)
-            }
-        })
+//        let username = "u@u.com"
+//        let password = "Jakt456!"
+//        JANetworkingConfiguration.token = nil
+//        
+//        JANetworking.loadJSON(resource: User.login(email: username, password: password), completion: { (data, error) in
+//            if error == nil {
+//                print("success")
+//                completion?(true)
+//            } else {
+//                print("error")
+//                completion?(false)
+//            }
+//        })
+        JANetworkingConfiguration.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IisxNTAyNDc1Mjc3OCIsInBob25lX251bWJlciI6IisxNTAyNDc1Mjc3OCIsInVzZXJfaWQiOiI1ZmQwOWUzNC0xM2RlLTQ3ZTgtOWQzZS00NWJjNmNiY2RjMDciLCJleHAiOjE0Nzk1MDI5OTgsIm9yaWdfaWF0IjoxNDc4ODk4MTk4LCJlbWFpbCI6IiJ9.fDuYih0BmIsTwoF933TlWMmpZuF7t-MypBNeLBIKELk"
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {

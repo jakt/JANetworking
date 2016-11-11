@@ -1,67 +1,43 @@
 //
 //  Post.swift
-//  JANetworking
+//  RDV
 //
-//  Created by Enrique on 7/5/16.
+//  Created by Eli Liebman on 8/8/16.
 //  Copyright © 2016 JAKT. All rights reserved.
 //
 
-import Foundation
+import UIKit
+import CoreData
 import JANetworking
+import CoreLocation
 
-struct Post {
-    let id: Int
-    let userName: String
-    var title: String
-    var body: String
+public enum PostType:String {
+    case color = "Color"
+    case image = "Image"
 }
 
-extension Post {
-    init?(dictionary: [String: Any]){
-        guard let id = dictionary["id"] as? Int,
-            let title = dictionary["title"] as? String,
-            let userName = dictionary["user_name"] as? String,
-            let body = dictionary["body"] as? String else { return nil }
+
+public enum PostFetchType:String {
+    case here = "here"
+    case now = "now"
+    case hereAndNow = "hereandnow"
+}
+
+public class Post:NSObject {
+    
+    //get all posts with now filter
+    public static func postOfType(_ type:PostFetchType, location:CLLocation? = nil) -> JANetworkingResource<[Post]> {
+        let url = URL(string: JANetworkingConfiguration.baseURL + "/posts/")!
+        var params:[String : Any]
+        if let location = location, type != .now {
+            params = ["filter": "here", "lat" : location.coordinate.latitude, "lon" : location.coordinate.longitude]
+        } else {
+            params = ["filter": type.rawValue]
+        }
         
-        self.id = id
-        self.userName = userName
-        self.title = title
-        self.body = body
-    }
-    
-    
-    // Get all post
-    static func all(headers: [String: String]?) -> JANetworkingResource<[Post]>{
-        let url = URL(string: baseUrl + "/posts")!
-        return JANetworkingResource(method: .GET, url: url, headers: headers, params: ["test":["test2":"test3"]], parseJSON: { json in
-            guard let dictionary = json as? JSONDictionary, let result = dictionary["results"] as? [JSONDictionary] else { return nil }
-            return result.flatMap(Post.init)
-        })
-    }
-    
-    // Submit a post
-    func submit(headers: [String: String]?) -> JANetworkingResource<Post>{
-        let url = URL(string: baseUrl + "/posts")!
-        let params:JSONDictionary = ["id": id,
-                                     "userName": userName,
-                                     "title": title,
-                                     "body": body]
-        return JANetworkingResource(method: .POST, url: url, headers: headers, params: params, parseJSON: { json in
-            guard let dictionary = json as? JSONDictionary else { return nil }
-            return Post(dictionary: dictionary)
-        })
-    }
-    
-    // Update a post
-    func update(headers: [String: String]?) -> JANetworkingResource<Post>{
-        let url = URL(string: baseUrl + "/posts/\(id)")!
-        let params:JSONDictionary = ["id": id,
-                                     "userName": userName,
-                                     "title": title,
-                                     "body": body]
-        return JANetworkingResource(method: .PUT, url: url, headers: headers, params: params, parseJSON: { json in
-            guard let dictionary = json as? JSONDictionary else { return nil }
-            return Post(dictionary: dictionary)
+        return JANetworkingResource(method: .GET, url: url, headers: nil, params: params, parseJSON: { json in
+            guard let dictionary = json as? JSONDictionary, let items = dictionary["results"] as? [JSONDictionary] else { return nil }
+            return nil
         })
     }
 }

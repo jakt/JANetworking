@@ -27,40 +27,29 @@ public final class JANetworking {
     }
     
     private static func createServerCall<A>(resource: JANetworkingResource<A>, useNextPage:Bool, retryCount:Int, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
-        var url = resource.url as URL
+        // Check if theres a valid nextPage url
+        var nextUrl:URL?
         if useNextPage {
             if let next = nextPageUrl[resource.id] {
                 // Key exists, now check if url exists
                 if let validUrl = next {
-                    url = validUrl
+                    nextUrl = validUrl
                 } else {
                     // Last page has already been called
                     let err = JAError(field: "Paging error", message: "Last page reached, no new pages available")
                     let error = JANetworkingError(errorType: ErrorType.badRequest, statusCode: 1, errorData: [err])
                     completion(nil, error)
+                    return
                 }
             } else {
-                // Key doesnt exist, first call of the paging request
+                // Key doesnt exist, first call of the paging request. Continue as normal
             }
         }
-        let request = NSMutableURLRequest(url: url)
-        request.httpMethod = resource.method.rawValue
-        
-        // Setup headers
-        
-        // Add default headers
-        for (key, value) in JANetworkingConfiguration.sharedConfiguration.configurationHeaders {
-            request.addValue(value, forHTTPHeaderField: key)
-        }
-        
-        if let headers = resource.headers {
-            for (key, value) in headers {
-                request.addValue(value, forHTTPHeaderField: key)
-            }
-        }
-        
-        // Setup params
-        if let params = resource.params {
+
+        // Create request
+        let request = NSMutableURLRequest(url: resource.url)
+        // Setup params if next page isn't valid
+        if let params = resource.params, nextUrl == nil {
             if resource.method == .GET {
                 var stringParams:[String:String]
                 if let sParams = params as? [String:String] {
@@ -77,8 +66,23 @@ public final class JANetworking {
             } else {
                 if let jsonParams = try? JSONSerialization.data(withJSONObject: params, options: []) {
                     request.httpBody = jsonParams
-                    //                    let convertedString = String(data: jsonParams, encoding: String.Encoding.utf8)
                 }
+            }
+        } else {
+            request.url = nextUrl
+        }
+        request.httpMethod = resource.method.rawValue
+        
+        // Setup headers
+        
+        // Add default headers
+        for (key, value) in JANetworkingConfiguration.sharedConfiguration.configurationHeaders {
+            request.addValue(value, forHTTPHeaderField: key)
+        }
+        
+        if let headers = resource.headers {
+            for (key, value) in headers {
+                request.addValue(value, forHTTPHeaderField: key)
             }
         }
         
@@ -87,6 +91,7 @@ public final class JANetworking {
             request.addValue("JWT \(token)", forHTTPHeaderField: "Authorization")
         }
         
+        print(request.url)
         URLSession.shared.dataTask(with: request as URLRequest) { (data:Data?, response:URLResponse?, error:Error?) in
             // error is nil when request fails. Not nil when the request passes. However even if the request went through, the reponse can be of status code error 400 up or 500 up
             if let errorObj = error {
@@ -141,7 +146,7 @@ public final class JANetworking {
                             completion(results, networkError)
                         }
                     } else {
-                        // SUCCESS
+                        // Valid token, return error and data
                         saveNextPage(for: resource, data: data)
                         completion(results, networkError)
                     }

@@ -35,27 +35,27 @@ class ViewController: UIViewController {
             print("testing token...")
         }
         
-        JANetworking.loadJSON(resource: Post.all(headers: nil)) { data, error in
+        JANetworking.loadJSON(resource: PostTest.all(headers: nil)) { data, error in
             if let err = error {
-                print("`Post.all` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
-                print("`Post.all` - ERROR: \(err.errorData)")
+                print("`PostTest.all` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
+                print("`PostTest.all` - ERROR: \(err.errorData)")
             }else{
                 if let data = data {
-                    print("`Post.all` - SUCCESS: \(data)")
+                    print("`PostTest.all` - SUCCESS: \(data)")
                 }
             }
         }
         
-        // Create a Post object
-        var post = Post(id: 100, userName: "Enrique W", title: "My Title", body: "Some Message Here.")
+        // Create a PostTest object
+        var post = PostTest(id: 100, userName: "Enrique W", title: "My Title", body: "Some Message Here.")
         JANetworking.loadJSON(resource: post.submit(headers: nil)) { data, error in
             if let err = error {
-                print("`Post.submit` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
-                print("`Post.submit` - ERROR: \(err.errorData)")
+                print("`PostTest.submit` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
+                print("`PostTest.submit` - ERROR: \(err.errorData)")
 
             }else{
                 if let data = data {
-                    print("`Post.submit` - SUCCESS: \(data)")
+                    print("`PostTest.submit` - SUCCESS: \(data)")
                 }
             }
         }
@@ -65,22 +65,22 @@ class ViewController: UIViewController {
         post.title = "Random"
         JANetworking.loadJSON(resource: post.update(headers: nil)) { data, error in
             if let err = error {
-                print("`Post.update` - ERROR: \(err.statusCode) \(err.errorType.errorTitle()))")
-                print("`Post.update` - ERROR: \(err.errorData)")
+                print("`PostTest.update` - ERROR: \(err.statusCode) \(err.errorType.errorTitle()))")
+                print("`PostTest.update` - ERROR: \(err.errorData)")
             }else{
                 if let data = data {
-                    print("`Post.update` - SUCCESS: \(data)")
+                    print("`PostTest.update` - SUCCESS: \(data)")
                 }
             }
         }
         
-        JANetworking.loadJSON(resource: Post.all(headers: nil)) { data, error in
+        JANetworking.loadJSON(resource: PostTest.all(headers: nil)) { data, error in
             if let err = error {
-                print("`Post.all` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
-                print("`Post.all` - ERROR: \(err.errorData)")
+                print("`PostTest.all` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
+                print("`PostTest.all` - ERROR: \(err.errorData)")
             }else{
                 if let data = data {
-                    print("`Post.all` - SUCCESS: \(data)")
+                    print("`PostTest.all` - SUCCESS: \(data)")
                 }
             }
         }
