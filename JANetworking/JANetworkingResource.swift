@@ -18,6 +18,7 @@ public enum RequestMethod: String {
 }
 
 public struct JANetworkingResource<A>{
+    public let id = UUID().uuidString
     public let method: RequestMethod
     public let url: URL
     public let headers: [String: String]?

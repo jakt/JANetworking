@@ -19,11 +19,31 @@ public final class JANetworking {
     weak public static var delegate:JANetworkDelegate?
     
     public static func loadJSON<A>(resource: JANetworkingResource<A>, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
-        createServerCall(resource: resource, retryCount:0, completion: completion)
+        createServerCall(resource: resource, useNextPage:false, retryCount:0, completion: completion)
     }
     
-    private static func createServerCall<A>(resource: JANetworkingResource<A>, retryCount:Int, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
-        let request = NSMutableURLRequest(url: resource.url as URL)
+    public static func loadPagedJSON<A>(resource: JANetworkingResource<A>, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
+        createServerCall(resource: resource, useNextPage:true, retryCount:0, completion: completion)
+    }
+    
+    private static func createServerCall<A>(resource: JANetworkingResource<A>, useNextPage:Bool, retryCount:Int, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
+        var url = resource.url as URL
+        if useNextPage {
+            if let next = nextPageUrl[resource.id] {
+                // Key exists, now check if url exists
+                if let validUrl = next {
+                    url = validUrl
+                } else {
+                    // Last page has already been called
+                    let err = JAError(field: "Paging error", message: "Last page reached, no new pages available")
+                    let error = JANetworkingError(errorType: ErrorType.badRequest, statusCode: 1, errorData: [err])
+                    completion(nil, error)
+                }
+            } else {
+                // Key doesnt exist, first call of the paging request
+            }
+        }
+        let request = NSMutableURLRequest(url: url)
         request.httpMethod = resource.method.rawValue
         
         // Setup headers
@@ -81,7 +101,7 @@ public final class JANetworking {
                             delegate.updateToken(completion: {(success:Bool) in
                                 if success {
                                     let count = retryCount + 1
-                                    createServerCall(resource: resource, retryCount: count, completion: completion)
+                                    createServerCall(resource: resource, useNextPage:useNextPage, retryCount: count, completion: completion)
                                 } else {
                                     self.delegate?.unauthorizedCallAttempted()
                                     completion(nil, networkError)
@@ -101,12 +121,16 @@ public final class JANetworking {
                     // Ensure that there is no error in the reponse and in the server
                     let networkError = JANetworkingError(responseError: response, serverError: JANetworkingError.parseServerError(data: data))
                     let results = data.flatMap(resource.parse)
-                    if networkError?.statusCode == 401 {
+                    var tokenInvalid = networkError?.statusCode == 401
+                    if let errorData = networkError?.errorData, let errorObj = errorData.first, let msg = errorObj.message, msg.contains("token") {
+                        tokenInvalid = true
+                    }
+                    if tokenInvalid {
                         if retryCount <= JANetworkingConfiguration.unauthorizedRetryLimit, let delegate = delegate {
-                            delegate.updateToken(completion: { (success:Bool) in
+                            delegate.updateToken(completion: {(success:Bool) in
                                 if success {
                                     let count = retryCount + 1
-                                    createServerCall(resource: resource, retryCount: count, completion: completion)
+                                    createServerCall(resource: resource, useNextPage:useNextPage, retryCount: count, completion: completion)
                                 } else {
                                     self.delegate?.unauthorizedCallAttempted()
                                     completion(results, networkError)
@@ -117,12 +141,25 @@ public final class JANetworking {
                             completion(results, networkError)
                         }
                     } else {
+                        // SUCCESS
+                        saveNextPage(for: resource, data: data)
                         completion(results, networkError)
                     }
                 })
             }
             
         }.resume()
+    }
+    
+    private static var nextPageUrl:[String:URL?] = [:]
+    private static func saveNextPage<A>(for resource:JANetworkingResource<A>, data:Data?) {
+        guard let data = data else {return}
+        let json = try? JSONSerialization.jsonObject(with: data, options: [])
+        
+        // Check for a JSON Web Token
+        if let parsedData = json as? JSONDictionary, let next = parsedData["next"] as? String {
+            nextPageUrl[resource.id] = URL(string: next)
+        }
     }
     
     private static func convertToStringDictionary(dictionary:[String:Any]) -> [String:String]? {

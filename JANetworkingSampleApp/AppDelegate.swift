@@ -20,14 +20,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         // Create CoreData context
         
-        //        let fontFamilyNames = UIFont.familyNames
-        //        for familyName in fontFamilyNames {
-        //            print("------------------------------")
-        //            print("Font Family Name = [\(familyName)]")
-        //            let names = UIFont.fontNames(forFamilyName: familyName)
-        //            print("Font Names = [\(names)]")
-        //        }
-        
         // Setup for JANetworking
         JANetworkingConfiguration.setBaseURL(development: "https://rs-exchange-dev.herokuapp.com/api", staging: "https://rs-exchange-staging.herokuapp.com/api", production: "https://rs-exchange-live.herokuapp.com/api")
         JANetworkingConfiguration.set(environment: .staging)
@@ -81,14 +73,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         JANetworkingConfiguration.token = nil
         
         JANetworking.loadJSON(resource: User.login(email: username, password: password), completion: { (data, error) in
-//            if error == nil {
-//                print("success")
-//                completion?(true)
-//            } else {
-//                print("error")
-//                completion?(false)
-//            }
-            completion?(false)
+            if error == nil {
+                print("success")
+                completion?(true)
+            } else {
+                print("error")
+                completion?(false)
+            }
         })
     }
     
