@@ -99,7 +99,7 @@ public class JAConnectivityManager{
         return true
     }
     
-    func checkCellConnection() -> String? {
+    private func checkCellConnection() -> String? {
         let telephonyInfo = CTTelephonyNetworkInfo()
         let currentRadio = telephonyInfo.currentRadioAccessTechnology
         return currentRadio
