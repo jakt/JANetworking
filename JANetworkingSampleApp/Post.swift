@@ -37,7 +37,36 @@ public class Post:NSObject {
         
         return JANetworkingResource(method: .GET, url: url, headers: nil, params: params, parseJSON: { json in
             guard let dictionary = json as? JSONDictionary, let items = dictionary["results"] as? [JSONDictionary] else { return nil }
-            return nil
+            return []
+        })
+    }
+    
+    public static func all() -> JANetworkingResource<[Post]> {
+        let url = URL(string: JANetworkingConfiguration.baseURL + "/posts/")!
+        return JANetworkingResource(method: .GET, url: url, headers: nil, params: nil, parseJSON: { json in
+            guard let dictionary = json as? JSONDictionary, let items = dictionary["results"] as? [JSONDictionary] else { return [] }
+            let posts:[Post] = []
+            return posts
+        })
+    }
+    
+    //like
+    public static func like(postID : String) -> JANetworkingResource<Bool> {
+        let url = URL(string: JANetworkingConfiguration.baseURL + "/posts/like/")!
+        let params = ["post" : postID]
+        return JANetworkingResource(method: .POST, url: url, headers: nil, params: params, parseJSON: { json in
+            guard let dictionary = json as? JSONDictionary, let status = dictionary["StatusCode"] as? Int  else { return false }
+            return status == 204
+        })
+    }
+    
+    //unlike
+    public static func unlike(postID : String) -> JANetworkingResource<Bool> {
+        let url = URL(string: JANetworkingConfiguration.baseURL + "/posts/like/")!
+        let params = ["post" : postID]
+        return JANetworkingResource(method: .DELETE, url: url, headers: nil, params: params, parseJSON: { json in
+            guard let dictionary = json as? JSONDictionary, let status = dictionary["StatusCode"] as? Int  else { return false }
+            return status == 204
         })
     }
 }

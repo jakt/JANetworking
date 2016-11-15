@@ -24,6 +24,7 @@ public struct JANetworkingResource<A>{
     public let headers: [String: String]?
     public let params: JSONDictionary?
     public let parse: (Data) -> A?
+    public let parseJson: (Any) -> A?
 }
 
 extension JANetworkingResource {
@@ -32,6 +33,7 @@ extension JANetworkingResource {
         self.url = url
         self.headers = headers
         self.params = params
+        self.parseJson = parseJSON
         self.parse = { data in
             let json = try? JSONSerialization.jsonObject(with: data, options: [])
             

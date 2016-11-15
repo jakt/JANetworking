@@ -59,24 +59,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         JANetworking.delegate = self
         
         let resource = Post.postOfType(.now)
+        loadPage(for: resource)
+        
+//        let resource = Post.like(postID: "5b067af9-a345-46cd-a9f7-1f2d08ec8955")
+//        let resource = Post.unlike(postID: "5b067af9-a345-46cd-a9f7-1f2d08ec8955")
+//        let resource = Post.all()
+//        JANetworking.loadJSON(resource: resource) { (data, error:JANetworkingError?) in
+//            print(error)
+//            print(data)
+//            print("******")
+//        }
+        
+        
+        return true
+    }
+    
+    func loadPage(for resource:JANetworkingResource<[Post]>) {
         JANetworking.loadPagedJSON(resource: resource) { (data, error) in
             if error == nil {
-                print("success")
-                JANetworking.loadPagedJSON(resource: resource) { (data, error) in
-                    if error == nil {
-                        print("success")
-                    } else {
-                        print("error")
-                    }
+                if JANetworking.isNextPageAvailable(for: resource) {
+                    self.loadPage(for: resource)
+                } else {
+                    print("NO PAGES LEFT")
                 }
             } else {
                 print("error")
             }
         }
-        
-        
-        
-        return true
     }
     
     func applicationWillResignActive(_ application: UIApplication) {

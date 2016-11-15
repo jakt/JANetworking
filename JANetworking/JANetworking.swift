@@ -16,6 +16,8 @@ import Foundation
 public final class JANetworking {
     // Load json request
     
+    private static let noMorePagesIdentifier = "No more pages"
+    
     weak public static var delegate:JANetworkDelegate?
     
     public static func loadJSON<A>(resource: JANetworkingResource<A>, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
@@ -26,6 +28,13 @@ public final class JANetworking {
         createServerCall(resource: resource, useNextPage:true, retryCount:0, completion: completion)
     }
     
+    public static func isNextPageAvailable<A>(for resource:JANetworkingResource<A>) -> Bool {
+        if let next = nextPageUrl[resource.id], next != noMorePagesIdentifier {
+            return true
+        }
+        return false
+    }
+    
     private static func createServerCall<A>(resource: JANetworkingResource<A>, useNextPage:Bool, retryCount:Int, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
         // Check if theres a valid nextPage url
@@ -33,8 +42,8 @@ public final class JANetworking {
         if useNextPage {
             if let next = nextPageUrl[resource.id] {
                 // Key exists, now check if url exists
-                if let validUrl = next {
-                    nextUrl = validUrl
+                if next != noMorePagesIdentifier {
+                    nextUrl = URL(string:next)
                 } else {
                     // Last page has already been called
                     let err = JAError(field: "Paging error", message: "Last page reached, no new pages available")
@@ -50,7 +59,9 @@ public final class JANetworking {
         // Create request
         let request = NSMutableURLRequest(url: resource.url)
         // Setup params if next page isn't valid
-        if let params = resource.params, nextUrl == nil {
+        if let nextUrl = nextUrl {
+            request.url = nextUrl
+        } else if let params = resource.params {
             if resource.method == .GET {
                 var stringParams:[String:String]
                 if let sParams = params as? [String:String] {
@@ -69,8 +80,6 @@ public final class JANetworking {
                     request.httpBody = jsonParams
                 }
             }
-        } else {
-            request.url = nextUrl
         }
         request.httpMethod = resource.method.rawValue
         
@@ -127,7 +136,12 @@ public final class JANetworking {
                     // Success request, HOWEVER the reponse can be with status code 400 and up (Errors)
                     // Ensure that there is no error in the reponse and in the server
                     let networkError = JANetworkingError(responseError: response, serverError: JANetworkingError.parseServerError(data: data))
-                    let results = data.flatMap(resource.parse)
+                    var results = data.flatMap(resource.parse)
+                    if results == nil {
+                        let responseObj = response as? HTTPURLResponse
+                        let successData = ["StatusCode":responseObj?.statusCode] as JSONDictionary
+                        results = resource.parseJson(successData)
+                    }
                     var tokenInvalid = networkError?.statusCode == 401
                     if let errorData = networkError?.errorData, let errorObj = errorData.first, let msg = errorObj.message, msg.contains("token") {
                         tokenInvalid = true
@@ -158,14 +172,16 @@ public final class JANetworking {
         }.resume()
     }
     
-    private static var nextPageUrl:[String:URL?] = [:]
+    private static var nextPageUrl:[String:String] = [:]
     private static func saveNextPage<A>(for resource:JANetworkingResource<A>, data:Data?) {
         guard let data = data else {return}
         let json = try? JSONSerialization.jsonObject(with: data, options: [])
         
         // Check for a JSON Web Token
         if let parsedData = json as? JSONDictionary, let next = parsedData["next"] as? String {
-            nextPageUrl[resource.id] = URL(string: next)
+            nextPageUrl[resource.id] = next
+        } else {
+            nextPageUrl[resource.id] = noMorePagesIdentifier
         }
     }
     
