@@ -26,11 +26,15 @@ public enum PostFetchType:String {
 public class Post:NSObject {
     
     //get all posts with now filter
-    public static func postOfType(_ type:PostFetchType, location:CLLocation? = nil) -> JANetworkingResource<[Post]> {
+    public static func postOfType(_ type:PostFetchType, location:CLLocationCoordinate2D? = nil, radius:Int? = nil) -> JANetworkingResource<[Post]> {
         let url = URL(string: JANetworkingConfiguration.baseURL + "/posts/")!
         var params:[String : Any]
         if let location = location, type != .now {
-            params = ["filter": "here", "lat" : location.coordinate.latitude, "lon" : location.coordinate.longitude]
+            params = ["filter": "here", "lat" : location.latitude, "lon" : location.longitude]
+            if let radius = radius, type == .here {
+                // RADIUS IS IN METERS. MAKE SURE TO CONVERT ACCORDINGLY BEFORE HANDING IN TO METHOD
+                params["radius"] = radius
+            }
         } else {
             params = ["filter": type.rawValue]
         }

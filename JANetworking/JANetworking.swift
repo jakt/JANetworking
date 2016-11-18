@@ -38,8 +38,18 @@ public final class JANetworking {
         if let next = nextPageUrl[resource.id] {
             if next != noMorePagesIdentifier {
                 if let pageLimit = pageLimit {
-                    let components = next.components(separatedBy: "page=")
-                    if let nextPageString = components.last, let nextPageCount = Int(nextPageString), nextPageCount > pageLimit {
+                    let andComponents = next.components(separatedBy: "&")
+                    var pageInt:Int?
+                    for component in andComponents {
+                        if component.contains("page=") {
+                            let pageComponents = component.components(separatedBy: "page=")
+                            if let nextPageString = pageComponents.last, let nextPageCount = Int(nextPageString) {
+                                pageInt = nextPageCount
+                                break
+                            }
+                        }
+                    }
+                    if let nextPageCount = pageInt, nextPageCount > pageLimit {
                         return false  // valid next page but pre-defined page limit reached already
                     }
                 }

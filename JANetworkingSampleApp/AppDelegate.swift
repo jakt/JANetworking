@@ -8,6 +8,7 @@
 
 import UIKit
 import JANetworking
+import CoreLocation
 
 let baseUrl = "http://demo3646012.mockable.io"
 
@@ -58,7 +59,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         JANetworkingConfiguration.unauthorizedRetryLimit = 1
         JANetworking.delegate = self
         
-        let resource = Post.postOfType(.now)
+        let location = CLLocationCoordinate2D(latitude: 41.597868744388492, longitude: -74.799476078810983)
+        let resource = Post.postOfType(.here, location:location, radius:2806104)
         loadPage(for: resource)
         
 //        let resource = Post.like(postID: "5b067af9-a345-46cd-a9f7-1f2d08ec8955")
