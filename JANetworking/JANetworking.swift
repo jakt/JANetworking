@@ -24,15 +24,30 @@ public final class JANetworking {
         createServerCall(resource: resource, useNextPage:false, retryCount:0, completion: completion)
     }
     
-    public static func loadPagedJSON<A>(resource: JANetworkingResource<A>, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
+    public static func loadPagedJSON<A>(resource: JANetworkingResource<A>, pageLimit:Int? = nil, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
+        if !isNextPageAvailable(for: resource, pageLimit: pageLimit) {
+            let err = JAError(field: "Paging error", message: "Last page reached, no new pages available")
+            let error = JANetworkingError(errorType: ErrorType.badRequest, statusCode: 1, errorData: [err])
+            completion(nil, error)
+            return
+        }
         createServerCall(resource: resource, useNextPage:true, retryCount:0, completion: completion)
     }
     
-    public static func isNextPageAvailable<A>(for resource:JANetworkingResource<A>) -> Bool {
-        if let next = nextPageUrl[resource.id], next != noMorePagesIdentifier {
-            return true
+    public static func isNextPageAvailable<A>(for resource:JANetworkingResource<A>, pageLimit:Int? = nil) -> Bool {
+        if let next = nextPageUrl[resource.id] {
+            if next != noMorePagesIdentifier {
+                if let pageLimit = pageLimit {
+                    let components = next.components(separatedBy: "page=")
+                    if let nextPageString = components.last, let nextPageCount = Int(nextPageString), nextPageCount > pageLimit {
+                        return false  // valid next page but pre-defined page limit reached already
+                    }
+                }
+                return true // Not page limit and next page url is valid
+            }
+            return false // last page has been hit
         }
-        return false
+        return true // No inital call has been made on resource
     }
     
     private static func createServerCall<A>(resource: JANetworkingResource<A>, useNextPage:Bool, retryCount:Int, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){

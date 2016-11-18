@@ -77,7 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func loadPage(for resource:JANetworkingResource<[Post]>) {
         JANetworking.loadPagedJSON(resource: resource) { (data, error) in
             if error == nil {
-                if JANetworking.isNextPageAvailable(for: resource) {
+                if JANetworking.isNextPageAvailable(for: resource, pageLimit:1) {
                     self.loadPage(for: resource)
                 } else {
                     print("NO PAGES LEFT")
@@ -118,7 +118,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //                completion?(false)
 //            }
 //        })
-        JANetworkingConfiguration.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IisxNTAyNDc1Mjc3OCIsInBob25lX251bWJlciI6IisxNTAyNDc1Mjc3OCIsInVzZXJfaWQiOiI1ZmQwOWUzNC0xM2RlLTQ3ZTgtOWQzZS00NWJjNmNiY2RjMDciLCJleHAiOjE0Nzk1MDI5OTgsIm9yaWdfaWF0IjoxNDc4ODk4MTk4LCJlbWFpbCI6IiJ9.fDuYih0BmIsTwoF933TlWMmpZuF7t-MypBNeLBIKELk"
+        JANetworkingConfiguration.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IiIsInVzZXJuYW1lIjoiKzE1MDI0NzUyNzc4IiwiZXhwIjoxNDgwMDEwMzU0LCJwaG9uZV9udW1iZXIiOiIrMTUwMjQ3NTI3NzgiLCJvcmlnX2lhdCI6MTQ3OTQwNTU1NCwidXNlcl9pZCI6IjVmZDA5ZTM0LTEzZGUtNDdlOC05ZDNlLTQ1YmM2Y2JjZGMwNyJ9.lUMhpXQZ_2ocVvYapa_9DTwCO2HX3jNtQYVM-llEMXc"
+        completion?(true)
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
