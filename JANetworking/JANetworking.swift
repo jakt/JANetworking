@@ -134,7 +134,7 @@ public final class JANetworking {
                 DispatchQueue.main.async(execute: {
                     let networkError = JANetworkingError(error: errorObj)
                     var tokenInvalid = networkError.statusCode == 401
-                    if let errorData = networkError.errorData, let errorObj = errorData.first, let msg = errorObj.message, msg.contains("token") {
+                    if let errorData = networkError.errorData, let errorObj = errorData.first, let msg = errorObj.message, (msg.contains("token") || msg.contains("expired")) {
                         tokenInvalid = true
                     }
                     if tokenInvalid {

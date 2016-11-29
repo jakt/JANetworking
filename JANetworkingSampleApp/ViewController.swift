@@ -102,7 +102,7 @@ class ViewController: UIViewController {
         // Normal download image
 //        http://4.bp.blogspot.com/-uhjF2kC3tFc/U_r3myvwzHI/AAAAAAAACiw/tPQ2XOXFYKY/s1600/Circles-3.gif
         JAImageManager.loadGIF(url: "https://rs-exchange-staging.s3.amazonaws.com:443/asset/asset/f3fa401f-2c82-486a-876e-693bf7e21894/5331c8bbfdb44a79a95682570228ed5d.gif") { (image, error) in
-//            self.imageView2.image = image
+            self.imageView2.image = image
         }
         
         let url = "https://rs-exchange-dev.s3.amazonaws.com:443/asset/asset/4963b762-d5e2-4516-915a-df4b90bc652a/e89e882cf0e74f5dbd8f9445cbf18b94.pdf"

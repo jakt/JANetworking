@@ -77,9 +77,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func loadPage(for resource:JANetworkingResource<[Post]>) {
-        JANetworking.loadPagedJSON(resource: resource) { (data, error) in
+        JANetworking.loadPagedJSON(resource: resource, pageLimit:2) { (data, error) in
             if error == nil {
-                if JANetworking.isNextPageAvailable(for: resource, pageLimit:1) {
+                if JANetworking.isNextPageAvailable(for: resource, pageLimit:2) {
                     self.loadPage(for: resource)
                 } else {
                     print("NO PAGES LEFT")
