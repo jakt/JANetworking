@@ -22,9 +22,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Create CoreData context
         
 //        // Setup for JANetworking
-//        JANetworkingConfiguration.setBaseURL(development: "https://rs-exchange-dev.herokuapp.com/api", staging: "https://rs-exchange-staging.herokuapp.com/api", production: "https://rs-exchange-live.herokuapp.com/api")
-//        JANetworkingConfiguration.set(environment: .staging)
-//        
+        JANetworkingConfiguration.setBaseURL(development: "https://rs-exchange-dev.herokuapp.com/api", staging: "https://rs-exchange-staging.herokuapp.com/api", production: "https://rs-exchange-live.herokuapp.com/api")
+        JANetworkingConfiguration.set(environment: .production)
+
         JANetworkingConfiguration.setLoadToken { () -> (String?) in
             return UserDefaults.standard.object(forKey: "token") as? String
         }
@@ -32,36 +32,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         JANetworkingConfiguration.setSaveToken { (token) in
             UserDefaults.standard.set(token, forKey: "token")
         }
+
+        JANetworkingConfiguration.unauthorizedRetryLimit = 1
+        JANetworking.delegate = self
 //
-//        JANetworkingConfiguration.unauthorizedRetryLimit = 1
-//        JANetworking.delegate = self
-//        
 //        //        refreshToken(completion:nil)
 //        
 //        // FOR TESTING, SET THE TOKEN TO AN OLD, INVALID TOKEN AND SEE IF JANETWORKING REFRESHES THE TOKEN CORRECTLY
-//        JANetworkingConfiguration.token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiYjNlN2RmNGUtY2E0My00YTk5LTk3OWQtNGI5MWNkOGVhNzc3IiwiZW1haWwiOiJ1QHUuY29tIiwiZXhwIjoxNDc4MjA4MjU4LCJ1c2VybmFtZSI6InVAdS5jb20iLCJvcmlnX2lhdCI6MTQ3ODIwNzM4M30.3XTUV7T2LzpyR4LVy5Kv--ICXfIjN4hvAV-apBNOUqo"
+        JANetworkingConfiguration.token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiYjNlN2RmNGUtY2E0My00YTk5LTk3OWQtNGI5MWNkOGVhNzc3IiwiZW1haWwiOiJ1QHUuY29tIiwiZXhwIjoxNDc4MjA4MjU4LCJ1c2VybmFtZSI6InVAdS5jb20iLCJvcmlnX2lhdCI6MTQ3ODIwNzM4M30.3XTUV7T2LzpyR4LVy5Kv--ICXfIjN4hvAV-apBNOUqo"
 //        
 //        JANetworking.loadJSON(resource: User.userDetails()) { (data, error) in
-//            if error == nil {
-//                print("success")
-//            } else {
-//                print("error")
-//            }
-//        }
+        JANetworking.loadJSON(resource: User.refreshToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmlnX2lhdCI6MTQ4MDQ2MjgxOCwiZXhwIjoxNDgwNDYzNDIwLCJ1c2VybmFtZSI6ImtAay5jb20iLCJ1c2VyX2lkIjoiMGFmYThiZjUtOGU2Zi00N2JkLTgzZTYtZjYzZjNhYzA2OTMzIiwiZW1haWwiOiJrQGsuY29tIn0._2PFrWYdiJg3Q7v6x8jH9qUbGsAHYaT60zzaWV6O-Vk")) { (data, error) in
+            if error == nil {
+                print("success")
+            } else {
+                print("error")
+            }
+        }
 
         
         
         
-        //Setup for JANetworking
-        JANetworkingConfiguration.setBaseURL(development: "https://rdv-development.herokuapp.com/api", staging: "https://rdv-development.herokuapp.com/api", production: "")
-        JANetworkingConfiguration.set(environment: .development)
-        
-        JANetworkingConfiguration.unauthorizedRetryLimit = 1
-        JANetworking.delegate = self
-        
-        let location = CLLocationCoordinate2D(latitude: 41.597868744388492, longitude: -74.799476078810983)
-        let resource = Post.postOfType(.here, location:location, radius:2806104)
-        loadPage(for: resource)
+//        //Setup for JANetworking
+//        JANetworkingConfiguration.setBaseURL(development: "https://rdv-development.herokuapp.com/api", staging: "https://rdv-development.herokuapp.com/api", production: "")
+//        JANetworkingConfiguration.set(environment: .development)
+//        
+//        JANetworkingConfiguration.unauthorizedRetryLimit = 1
+//        JANetworking.delegate = self
+//        
+//        let location = CLLocationCoordinate2D(latitude: 41.597868744388492, longitude: -74.799476078810983)
+//        let resource = Post.postOfType(.here, location:location, radius:2806104)
+//        loadPage(for: resource)
         
 //        let resource = Post.like(postID: "5b067af9-a345-46cd-a9f7-1f2d08ec8955")
 //        let resource = Post.unlike(postID: "5b067af9-a345-46cd-a9f7-1f2d08ec8955")
@@ -107,21 +108,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func refreshToken(completion:((Bool)->Void)?) {
         // Auto log user in using the user credential saved in locksmith
-//        let username = "u@u.com"
-//        let password = "Jakt456!"
-//        JANetworkingConfiguration.token = nil
-//        
-//        JANetworking.loadJSON(resource: User.login(email: username, password: password), completion: { (data, error) in
-//            if error == nil {
-//                print("success")
-//                completion?(true)
-//            } else {
-//                print("error")
-//                completion?(false)
-//            }
-//        })
-        JANetworkingConfiguration.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IiIsInVzZXJuYW1lIjoiKzE1MDI0NzUyNzc4IiwiZXhwIjoxNDgwMDEwMzU0LCJwaG9uZV9udW1iZXIiOiIrMTUwMjQ3NTI3NzgiLCJvcmlnX2lhdCI6MTQ3OTQwNTU1NCwidXNlcl9pZCI6IjVmZDA5ZTM0LTEzZGUtNDdlOC05ZDNlLTQ1YmM2Y2JjZGMwNyJ9.lUMhpXQZ_2ocVvYapa_9DTwCO2HX3jNtQYVM-llEMXc"
-        completion?(true)
+        let username = "j@j.com"
+        let password = "Jakt456!"
+        JANetworkingConfiguration.token = nil
+        
+        JANetworking.loadJSON(resource: User.login(email: username, password: password), completion: { (data, error) in
+            if error == nil {
+                print("success")
+                completion?(true)
+            } else {
+                print("error")
+                completion?(false)
+            }
+        })
+//        JANetworkingConfiguration.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IiIsInVzZXJuYW1lIjoiKzE1MDI0NzUyNzc4IiwiZXhwIjoxNDgwMDEwMzU0LCJwaG9uZV9udW1iZXIiOiIrMTUwMjQ3NTI3NzgiLCJvcmlnX2lhdCI6MTQ3OTQwNTU1NCwidXNlcl9pZCI6IjVmZDA5ZTM0LTEzZGUtNDdlOC05ZDNlLTQ1YmM2Y2JjZGMwNyJ9.lUMhpXQZ_2ocVvYapa_9DTwCO2HX3jNtQYVM-llEMXc"
+//        completion?(true)
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {

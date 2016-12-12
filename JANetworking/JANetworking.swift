@@ -126,7 +126,6 @@ public final class JANetworking {
             request.addValue("JWT \(token)", forHTTPHeaderField: "Authorization")
         }
         
-        print(request.url)
         URLSession.shared.dataTask(with: request as URLRequest) { (data:Data?, response:URLResponse?, error:Error?) in
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
             // error is nil when request fails. Not nil when the request passes. However even if the request went through, the reponse can be of status code error 400 up or 500 up
@@ -168,11 +167,11 @@ public final class JANetworking {
                         results = resource.parseJson(successData)
                     }
                     var tokenInvalid = networkError?.statusCode == 401
-                    if let errorData = networkError?.errorData, let errorObj = errorData.first, let msg = errorObj.message, msg.contains("token") {
+                    if let errorData = networkError?.errorData, let errorObj = errorData.first, let msg = errorObj.message, (msg.contains("token") || msg.contains("expired")) {
                         tokenInvalid = true
                     }
                     if tokenInvalid {
-                        if retryCount <= JANetworkingConfiguration.unauthorizedRetryLimit, let delegate = delegate {
+                        if retryCount < JANetworkingConfiguration.unauthorizedRetryLimit, let delegate = delegate {
                             delegate.updateToken(completion: {(success:Bool) in
                                 if success {
                                     let count = retryCount + 1

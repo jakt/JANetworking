@@ -32,7 +32,7 @@ public final class JANetworkingConfiguration {
         return nil
     }
     
-    private var currentEnvironment:NetworkEnvironment = .development
+    public private(set) var currentEnvironment:NetworkEnvironment = .development
 
     public class var baseURL:String {
         get {
