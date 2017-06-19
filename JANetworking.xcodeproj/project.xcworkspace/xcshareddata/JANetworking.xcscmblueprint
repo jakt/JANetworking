@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "1357CB90D33060A82336F37F559465C89A4D5D7E",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "1357CB90D33060A82336F37F559465C89A4D5D7E" : 9223372036854775807,
+    "865AF0F91FF8A2802F2AB68E9B93AFCBDBF32D43" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "33747691-6A23-496A-9768-2F71DAD40A86",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "1357CB90D33060A82336F37F559465C89A4D5D7E" : "JANetworking\/",
+    "865AF0F91FF8A2802F2AB68E9B93AFCBDBF32D43" : ""
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "JANetworking",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "JANetworking.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/jakt\/JANetworking.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "1357CB90D33060A82336F37F559465C89A4D5D7E"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/jakt\/CoreDataTest.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "865AF0F91FF8A2802F2AB68E9B93AFCBDBF32D43"
+    }
+  ]
+}

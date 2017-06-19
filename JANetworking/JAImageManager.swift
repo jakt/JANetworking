@@ -59,7 +59,7 @@ public final class JAImageManager: NSObject {
     
     private static func localImageFileForURL(localURL:String?, type:MediaType) -> UIImage? {
         let checkImage = FileManager.default
-        if let localURL = localURL , checkImage.fileExists(atPath: localURL) && JANetworkingConfiguration.sharedConfiguration.automaticallySaveImageToDisk {
+        if let localURL = localURL , checkImage.fileExists(atPath: localURL) && JANetworkingConfiguration.automaticallySaveImageToDisk {
             var image:UIImage?
             switch type {
             case .image:
@@ -142,8 +142,8 @@ public final class JAImageManager: NSObject {
         } else {
             JAImageManager.loadImageMedia(url: imageUrl, type: .image) {[unowned self] (image, error) in
                 if let err = error {
-                    print("`JANetworking Load.image` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
-                    print("`JANetworking Load.image` - ERROR: \(err.errorData)")
+                    print("`JANetworking Load.image` - ERROR: \(err.statusCode ?? 0) \(err.errorType.errorTitle())")
+                    if let data = err.errorData { print("`JANetworking Load.image` - ERROR: \(data)") }
                     asyncCompletion(nil, err)
                 } else {
                     if let img = image {
@@ -183,7 +183,7 @@ public final class JAImageManager: NSObject {
                         case .gif:
                             image = UIImage.gifWithData(data: imageData)
                         }
-                        if let _ = image , JANetworkingConfiguration.sharedConfiguration.automaticallySaveImageToDisk {
+                        if let _ = image , JANetworkingConfiguration.automaticallySaveImageToDisk {
                             JAImageManager.writeMediaToFile(imageData: imageData, imageURL: localURL)
                         }
                     }
@@ -239,8 +239,8 @@ public extension UIImageView {
         }
         JAImageManager.loadImageMedia(url: url, type: .gif) { (image, error) in
             if let err = error {
-                print("`JANetworking Load.image` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
-                print("`JANetworking Load.image` - ERROR: \(err.errorData)")
+                print("`JANetworking Load.image` - ERROR: \(err.statusCode ?? 0) \(err.errorType.errorTitle())")
+                if let data = err.errorData { print("`JANetworking Load.image` - ERROR: \(data)") }
             }else{
                 if let img = image {
                     self.image = img

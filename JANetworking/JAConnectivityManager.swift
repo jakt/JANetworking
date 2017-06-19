@@ -9,15 +9,15 @@
 import UIKit
 import CoreTelephony
 
-//public let weakSignalNotifcationName = "JANetworkingWeakSignal"
 public let noSignalNotifcationName = "JANetworkingNoSignal"
 public let regainSignalNotifcationName = "JANetworkingRegainSignal"
 
-public class JAConnectivityManager{
+public class JAConnectivityManager {
 
     static let sharedInstance = JAConnectivityManager()
-    var reachability: Reachability?
+    private var reachability: Reachability?
 
+    /// Function that initilizes and configures JAConnectivityManager
     public func setupReachability(regainConnectionBlock:(()->Void)? = nil, loseConnectionBlock:(()->Void)? = nil){
         reachability = Reachability()
         
@@ -53,7 +53,7 @@ public class JAConnectivityManager{
         }
     }
 
-    // Checks if there is any connection at all
+    /// Checks if there is any connection at all
     public func isConnectionReachable() -> Bool{
         let networkStatus = reachability?.currentReachabilityStatus
         
@@ -64,7 +64,7 @@ public class JAConnectivityManager{
         return true
     }
     
-    // Checks if connection is unreachable or on 1x/Edge. Returns false if connection is LTE, 3G, or WiFi
+    /// Checks if connection is unreachable or on 1x/Edge. Returns false if connection is LTE, 3G, or WiFi
     public func isConnectionSlow() -> Bool {
         let networkStatus = reachability?.currentReachabilityStatus
         

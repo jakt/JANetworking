@@ -22,7 +22,7 @@ class JANetworkingTests: XCTestCase {
     }
     
     func testJANetworkingResource(){
-        let res = JANetworkingResource(method: .GET, url: NSURL(string: "www.google.com")!, headers: nil, params: nil, parseJSON: { json in
+        let res = JANetworkingResource(method: .GET, url: URL(string: "www.google.com")!, headers: nil, params: nil, parseJSON: { json in
             print("Callback parseJSON")
         })
         
@@ -34,42 +34,42 @@ class JANetworkingTests: XCTestCase {
     }
     
     func testJANetworkingError(){
-        let error1 = JANetworkingError(errorType: .Unauthorized, statusCode: 401, errorData: nil)
+        let error1 = JANetworkingError(errorType: .unauthorized, statusCode: 401, errorData: nil)
         XCTAssertNotNil(error1)
         XCTAssertNotNil(error1.errorType)
-        XCTAssertEqual(error1.errorType, ErrorType.Unauthorized)
+        XCTAssertEqual(error1.errorType, ErrorType.unauthorized)
         XCTAssertEqual(error1.statusCode, 401)
         XCTAssertEqual(error1.errorType.errorTitle(), "Access Denied")
 
-        let error2 = JANetworkingError(errorType: .Unknown, statusCode: nil, errorData: nil)
+        let error2 = JANetworkingError(errorType: .unknown, statusCode: nil, errorData: nil)
         XCTAssertNotNil(error2)
         XCTAssertNotNil(error2.errorType)
-        XCTAssertEqual(error2.errorType, ErrorType.Unknown)
+        XCTAssertEqual(error2.errorType, ErrorType .unknown)
         XCTAssertEqual(error2.errorType.errorTitle(), "Unknown")
         XCTAssertNil(error2.statusCode)
         
-        let error3 = JANetworkingError(error: Error(domain: "somedomain", code: -1000, userInfo: nil))
+        let error3 = JANetworkingError(error: NSError(domain: "somedomain", code: 1, userInfo: nil))
         XCTAssertNotNil(error3)
         XCTAssertNotNil(error3.errorType)
-        XCTAssertEqual(error3.errorType, ErrorType.NSURLError)
+        XCTAssertEqual(error3.errorType, ErrorType.nsurlError)
         XCTAssertEqual(error3.errorType.errorTitle(), "NSURLError")
         XCTAssertNil(error3.statusCode)
         XCTAssertNotNil(error3.errorData)
 
-        let error4 = JANetworkingError(responseError: NSHTTPURLResponse(URL: NSURL(string:"somedomain")!, statusCode: 200, HTTPVersion: nil, headerFields: nil), serverError: nil)
+        let error4 = JANetworkingError(responseError: HTTPURLResponse(url: URL(string:"somedomain")!, statusCode: 200, httpVersion: nil, headerFields: nil), serverError: nil)
         XCTAssertNil(error4)
 
-        let error5 = JANetworkingError(responseError: NSHTTPURLResponse(URL: NSURL(string:"somedomain")!, statusCode: 400, HTTPVersion: nil, headerFields: nil), serverError: nil)
+        let error5 = JANetworkingError(responseError: HTTPURLResponse(url: URL(string:"somedomain")!, statusCode: 400, httpVersion: nil, headerFields: nil), serverError: nil)
         XCTAssertNotNil(error5)
         XCTAssertNotNil(error5!.errorType)
-        XCTAssertEqual(error5!.errorType, ErrorType.BadRequest)
+        XCTAssertEqual(error5!.errorType, ErrorType.badRequest)
         XCTAssertNotNil(error5!.errorType.errorTitle(), "Bad Request")
         XCTAssertEqual(error5!.statusCode, 400)
         XCTAssertNil(error5!.errorData)
 
-        let error6 = JANetworkingError(responseError: NSHTTPURLResponse(URL: NSURL(string:"somedomain")!, statusCode: 405, HTTPVersion: nil, headerFields: nil), serverError: [JAError(field: nil, message:"Some error")])
+        let error6 = JANetworkingError(responseError: HTTPURLResponse(url: URL(string:"somedomain")!, statusCode: 405, httpVersion: nil, headerFields: nil), serverError: [JAError(field: nil, message:"Some error")])
         XCTAssertNotNil(error6!.errorType)
-        XCTAssertEqual(error6!.errorType, ErrorType.MethodNotAllowed)
+        XCTAssertEqual(error6!.errorType, ErrorType.methodNotAllowed)
         XCTAssertEqual(error6!.statusCode, 405)
         XCTAssertEqual(error6!.errorType.errorTitle(), "Method Not Allowed")
         XCTAssertNotNil(error6!.errorData!)

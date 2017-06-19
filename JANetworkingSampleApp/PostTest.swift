@@ -17,7 +17,7 @@ struct PostTest {
 }
 
 extension PostTest {
-    init?(dictionary: [String: Any]){
+    init?(dictionary: JSONDictionary){
         guard let id = dictionary["id"] as? Int,
             let title = dictionary["title"] as? String,
             let userName = dictionary["user_name"] as? String,
@@ -32,7 +32,7 @@ extension PostTest {
     
     // Get all post
     static func all(headers: [String: String]?) -> JANetworkingResource<[PostTest]>{
-        let url = URL(string: baseUrl + "/posts")!
+        let url = URL(string: JANetworkingConfiguration.baseURL + "/posts")!
         return JANetworkingResource(method: .GET, url: url, headers: headers, params: ["test":["test2":"test3"]], parseJSON: { json in
             guard let dictionary = json as? JSONDictionary, let result = dictionary["results"] as? [JSONDictionary] else { return nil }
             return result.flatMap(PostTest.init)
@@ -41,7 +41,7 @@ extension PostTest {
     
     // Submit a post
     func submit(headers: [String: String]?) -> JANetworkingResource<PostTest>{
-        let url = URL(string: baseUrl + "/posts")!
+        let url = URL(string: JANetworkingConfiguration.baseURL + "/posts")!
         let params:JSONDictionary = ["id": id,
                                      "userName": userName,
                                      "title": title,
@@ -54,7 +54,7 @@ extension PostTest {
     
     // Update a post
     func update(headers: [String: String]?) -> JANetworkingResource<PostTest>{
-        let url = URL(string: baseUrl + "/posts/\(id)")!
+        let url = URL(string: JANetworkingConfiguration.baseURL + "/posts/\(id)")!
         let params:JSONDictionary = ["id": id,
                                      "userName": userName,
                                      "title": title,

@@ -15,30 +15,12 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        
-        ///////////////////////////////////////////////////////////////////////////
-        // USAGE
-        ///////////////////////////////////////////////////////////////////////////
         
         // Get all posts
-        
-        JANetworkingConfiguration.setLoadToken { () -> (String?) in
-            return UserDefaults.standard.object(forKey: "token") as? String
-        }
-        
-        JANetworkingConfiguration.setSaveToken { (token) in
-            UserDefaults.standard.set(token, forKey: "token")
-        }
-        
-        JANetworkingConfiguration.setUpRefreshTimer(timeInterval: 30) {
-            print("testing token...")
-        }
-        
         JANetworking.loadJSON(resource: PostTest.all(headers: nil)) { data, error in
             if let err = error {
-                print("`PostTest.all` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
-                print("`PostTest.all` - ERROR: \(err.errorData)")
+                print("`PostTest.all` - ERROR: \(err.statusCode ?? 0) \(err.errorType.errorTitle())")
+                if let data = err.errorData { print("`PostTest.all` - ERROR: \(data)") }
             }else{
                 if let data = data {
                     print("`PostTest.all` - SUCCESS: \(data)")
@@ -50,8 +32,8 @@ class ViewController: UIViewController {
         var post = PostTest(id: 100, userName: "Enrique W", title: "My Title", body: "Some Message Here.")
         JANetworking.loadJSON(resource: post.submit(headers: nil)) { data, error in
             if let err = error {
-                print("`PostTest.submit` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
-                print("`PostTest.submit` - ERROR: \(err.errorData)")
+                print("`PostTest.submit` - ERROR: \(err.statusCode ?? 0) \(err.errorType.errorTitle())")
+                if let data = err.errorData { print("`PostTest.all` - ERROR: \(data)") }
 
             }else{
                 if let data = data {
@@ -61,12 +43,12 @@ class ViewController: UIViewController {
         }
         
         // Update a post
-        // ERROR endpoint, should return 405. I set it this way to test
+        // ERROR endpoint, should return 405.
         post.title = "Random"
         JANetworking.loadJSON(resource: post.update(headers: nil)) { data, error in
             if let err = error {
-                print("`PostTest.update` - ERROR: \(err.statusCode) \(err.errorType.errorTitle()))")
-                print("`PostTest.update` - ERROR: \(err.errorData)")
+                print("`PostTest.update` - ERROR: \(err.statusCode ?? 0) \(err.errorType.errorTitle()))")
+                if let data = err.errorData { print("`PostTest.all` - ERROR: \(data)") }
             }else{
                 if let data = data {
                     print("`PostTest.update` - SUCCESS: \(data)")
@@ -76,8 +58,8 @@ class ViewController: UIViewController {
         
         JANetworking.loadJSON(resource: PostTest.all(headers: nil)) { data, error in
             if let err = error {
-                print("`PostTest.all` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
-                print("`PostTest.all` - ERROR: \(err.errorData)")
+                print("`PostTest.all` - ERROR: \(err.statusCode ?? 0) \(err.errorType.errorTitle())")
+                if let data = err.errorData { print("`PostTest.all` - ERROR: \(data)") }
             }else{
                 if let data = data {
                     print("`PostTest.all` - SUCCESS: \(data)")
@@ -87,32 +69,51 @@ class ViewController: UIViewController {
         
         // Download image with imageview extension
         let placeholder = UIImage(named: "placeholder")
-//        https://www.clicktorelease.com/code/gif/1.gif
-//        https://static.pexels.com/photos/8700/wall-animal-dog-pet.jpg
-//        https://rs-exchange-staging.s3.amazonaws.com:443/asset/asset/86/15/51cd59696d975238ea37d195c540.gif
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             self.imageView.image = #imageLiteral(resourceName: "placeholder")
             self.imageView.setNeedsDisplay()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                 self.imageView.downloadImage(url: "https://static.pexels.com/photos/3247/nature-forest-industry-rails.jpg", placeholder: placeholder)
-            }
-//            imageView.downloadImage(url: "http://www.flooringvillage.co.uk/ekmps/shops/flooringvillage/images/request-a-sample--547-p.jpg", placeholder: placeholder)
+//            }
         }
         
         // Normal download image
-//        http://4.bp.blogspot.com/-uhjF2kC3tFc/U_r3myvwzHI/AAAAAAAACiw/tPQ2XOXFYKY/s1600/Circles-3.gif
-        JAImageManager.loadGIF(url: "https://rs-exchange-staging.s3.amazonaws.com:443/asset/asset/f3fa401f-2c82-486a-876e-693bf7e21894/5331c8bbfdb44a79a95682570228ed5d.gif") { (image, error) in
+        JAImageManager.loadGIF(url: "http://4.bp.blogspot.com/-uhjF2kC3tFc/U_r3myvwzHI/AAAAAAAACiw/tPQ2XOXFYKY/s1600/Circles-3.gif") { (image, error) in
             self.imageView2.image = image
         }
         
         let url = "https://rs-exchange-dev.s3.amazonaws.com:443/asset/asset/4963b762-d5e2-4516-915a-df4b90bc652a/e89e882cf0e74f5dbd8f9445cbf18b94.pdf"
         JAImageManager.loadGenericMedia(url: url, completion: { (localpath:String?, error:JANetworkingError?) in
             if let err = error {
-                print(err.statusCode)
+                print(err.statusCode ?? 0)
             } else {
-                print(localpath)
+                print(localpath ?? "No local path")
             }
         })
+    }
+    
+    // Test loading a resource
+    func testPosts() {
+        // FOR TESTING, SET THE TOKEN TO AN OLD, INVALID TOKEN AND SEE IF JANETWORKING REFRESHES THE TOKEN CORRECTLY
+        JANetworkingConfiguration.token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiYjNlN2RmNGUtY2E0My00YTk5LTk3OWQtNGI5MWNkOGVhNzc3IiwiZW1haWwiOiJ1QHUuY29tIiwiZXhwIjoxNDc4MjA4MjU4LCJ1c2VybmFtZSI6InVAdS5jb20iLCJvcmlnX2lhdCI6MTQ3ODIwNzM4M30.3XTUV7T2LzpyR4LVy5Kv--ICXfIjN4hvAV-apBNOUqo"
+        
+//        let singelResource = Post.postWithId("<UNIQUE IDENTIFIER>")
+        let arrayResource = Post.all()
+        loadPage(for: arrayResource)
+    }
+    
+    func loadPage<A>(for resource:JANetworkingResource<A>) {
+        JANetworking.loadPagedJSON(resource: resource, pageLimit:2) { (data, error) in
+            if error == nil {
+                if JANetworking.isNextPageAvailable(for: resource, pageLimit:2) {
+                    self.loadPage(for: resource)
+                } else {
+                    print("NO PAGES LEFT")
+                }
+            } else {
+                print("error")
+            }
+        }
     }
 
     override func didReceiveMemoryWarning() {

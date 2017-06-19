@@ -11,45 +11,42 @@ import CoreData
 import JANetworking
 import CoreLocation
 
-public enum PostType:String {
-    case color = "Color"
-    case image = "Image"
-}
-
-
-public enum PostFetchType:String {
-    case here = "here"
-    case now = "now"
-    case hereAndNow = "hereandnow"
-}
-
 public class Post:NSObject {
     
-    //get all posts with now filter
-    public static func postOfType(_ type:PostFetchType, location:CLLocationCoordinate2D? = nil, radius:Int? = nil) -> JANetworkingResource<[Post]> {
-        let url = URL(string: JANetworkingConfiguration.baseURL + "/posts/")!
-        var params:[String : Any]
-        if let location = location, type != .now {
-            params = ["filter": "here", "lat" : location.latitude, "lon" : location.longitude]
-            if let radius = radius, type == .here {
-                // RADIUS IS IN METERS. MAKE SURE TO CONVERT ACCORDINGLY BEFORE HANDING IN TO METHOD
-                params["radius"] = radius
-            }
-        } else {
-            params = ["filter": type.rawValue]
+    public var id:String
+    public var title:String
+    public var body:String
+    public var authorId:String
+    
+    init?(json:JSONDictionary) {
+        guard let id = json["id"] as? String,
+            let title = json["title"] as? String,
+            let body = json["body"] as? String,
+            let authorId = json["author_id"] as? String else {
+                return nil
         }
         
+        self.id = id
+        self.title = title
+        self.body = body
+        self.authorId = authorId
+    }
+    
+    //get all posts with now filter
+    public static func postWithId(_ id:String) -> JANetworkingResource<Post?> {
+        let url = URL(string: JANetworkingConfiguration.baseURL + "/posts/")!
+        let params:JSONDictionary = ["post_id": id]
         return JANetworkingResource(method: .GET, url: url, headers: nil, params: params, parseJSON: { json in
-            guard let dictionary = json as? JSONDictionary, let items = dictionary["results"] as? [JSONDictionary] else { return nil }
-            return []
+            guard let dictionary = json as? JSONDictionary, let postDictionary = dictionary["results"] as? JSONDictionary else { return nil }
+            return Post(json: postDictionary)
         })
     }
     
-    public static func all() -> JANetworkingResource<[Post]> {
+    public static func all() -> JANetworkingResource<[Post]?> {
         let url = URL(string: JANetworkingConfiguration.baseURL + "/posts/")!
         return JANetworkingResource(method: .GET, url: url, headers: nil, params: nil, parseJSON: { json in
-            guard let dictionary = json as? JSONDictionary, let items = dictionary["results"] as? [JSONDictionary] else { return [] }
-            let posts:[Post] = []
+            guard let dictionary = json as? JSONDictionary, let items = dictionary["results"] as? [JSONDictionary] else { return nil }
+            let posts = items.flatMap(Post.init)
             return posts
         })
     }
