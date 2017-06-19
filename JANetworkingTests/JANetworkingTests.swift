@@ -21,58 +21,111 @@ class JANetworkingTests: XCTestCase {
         super.tearDown()
     }
     
-    func testJANetworkingResource(){
-        let res = JANetworkingResource(method: .GET, url: URL(string: "www.google.com")!, headers: nil, params: nil, parseJSON: { json in
-            print("Callback parseJSON")
+    func testServerCalls() {
+        let asyncExpectation = expectation(description: "async")
+        
+        var count = 0
+        
+        let resource1 = JANetworkingResource(method: .GET, url: URL(string:"www.google.com")!, headers: nil, params: nil, parseJSON: { json in
+            return true
+        })
+        let resource2 = JANetworkingResource(method: .GET, url: URL(string:"https://www.google")!, headers: nil, params: nil, parseJSON: { json in
+            return true
+        })
+        let resource3 = JANetworkingResource(method: .GET, url: URL(string:"https://www.google.com")!, headers: nil, params: nil, parseJSON: { json in
+            return true
         })
         
-        XCTAssertNotNil(res.method)
-        XCTAssertNotNil(res.url)
-
-        XCTAssertNil(res.headers)
-        XCTAssertNil(res.params)
+        JANetworking.loadJSON(resource: resource1) { (result, error) in
+            // URL should fail
+            XCTAssertNil(result)
+            XCTAssertNotNil(error)
+            count += 1
+            if count >= 3 {
+                asyncExpectation.fulfill()
+            }
+        }
+        JANetworking.loadJSON(resource: resource2) { (result, error) in
+            // URL should fail
+            XCTAssertNil(result)
+            XCTAssertNotNil(error)
+            count += 1
+            if count >= 3 {
+                asyncExpectation.fulfill()
+            }
+        }
+        JANetworking.loadJSON(resource: resource3) { (result, error) in
+            // URL should be valid and work as normal
+            XCTAssertTrue(result!)
+            XCTAssertNil(error)
+            count += 1
+            if count >= 3 {
+                asyncExpectation.fulfill()
+            }
+        }
+        
+        waitForExpectations(timeout: 60) { error in
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+            }
+        }
     }
     
-    func testJANetworkingError(){
-        let error1 = JANetworkingError(errorType: .unauthorized, statusCode: 401, errorData: nil)
-        XCTAssertNotNil(error1)
-        XCTAssertNotNil(error1.errorType)
-        XCTAssertEqual(error1.errorType, ErrorType.unauthorized)
-        XCTAssertEqual(error1.statusCode, 401)
-        XCTAssertEqual(error1.errorType.errorTitle(), "Access Denied")
-
-        let error2 = JANetworkingError(errorType: .unknown, statusCode: nil, errorData: nil)
-        XCTAssertNotNil(error2)
-        XCTAssertNotNil(error2.errorType)
-        XCTAssertEqual(error2.errorType, ErrorType .unknown)
-        XCTAssertEqual(error2.errorType.errorTitle(), "Unknown")
-        XCTAssertNil(error2.statusCode)
+    func testInvalidNextPage() {
+        let asyncExpectation = expectation(description: "async")
         
-        let error3 = JANetworkingError(error: NSError(domain: "somedomain", code: 1, userInfo: nil))
-        XCTAssertNotNil(error3)
-        XCTAssertNotNil(error3.errorType)
-        XCTAssertEqual(error3.errorType, ErrorType.nsurlError)
-        XCTAssertEqual(error3.errorType.errorTitle(), "NSURLError")
-        XCTAssertNil(error3.statusCode)
-        XCTAssertNotNil(error3.errorData)
-
-        let error4 = JANetworkingError(responseError: HTTPURLResponse(url: URL(string:"somedomain")!, statusCode: 200, httpVersion: nil, headerFields: nil), serverError: nil)
-        XCTAssertNil(error4)
-
-        let error5 = JANetworkingError(responseError: HTTPURLResponse(url: URL(string:"somedomain")!, statusCode: 400, httpVersion: nil, headerFields: nil), serverError: nil)
-        XCTAssertNotNil(error5)
-        XCTAssertNotNil(error5!.errorType)
-        XCTAssertEqual(error5!.errorType, ErrorType.badRequest)
-        XCTAssertNotNil(error5!.errorType.errorTitle(), "Bad Request")
-        XCTAssertEqual(error5!.statusCode, 400)
-        XCTAssertNil(error5!.errorData)
-
-        let error6 = JANetworkingError(responseError: HTTPURLResponse(url: URL(string:"somedomain")!, statusCode: 405, httpVersion: nil, headerFields: nil), serverError: [JAError(field: nil, message:"Some error")])
-        XCTAssertNotNil(error6!.errorType)
-        XCTAssertEqual(error6!.errorType, ErrorType.methodNotAllowed)
-        XCTAssertEqual(error6!.statusCode, 405)
-        XCTAssertEqual(error6!.errorType.errorTitle(), "Method Not Allowed")
-        XCTAssertNotNil(error6!.errorData!)
-        XCTAssertNotNil(error6!.errorData!.first?.message, "Some error")
+        let resource = JANetworkingResource(method: .GET, url: URL(string:"https://www.google.com")!, headers: nil, params: nil, parseJSON: { json in
+            //
+        })
+        let nextAvailable = JANetworking.isNextPageAvailable(for: resource)
+        XCTAssertTrue(nextAvailable)  // Should always return true on first attempt
+        
+        JANetworking.loadPagedJSON(resource: resource) { (result, error) in
+            let nextAvailableAfterLoad = JANetworking.isNextPageAvailable(for: resource)
+            XCTAssertFalse(nextAvailableAfterLoad)  // Now that the resource has been loaded and the resource isn't paged, this should always return false
+            asyncExpectation.fulfill()
+        }
+        
+        waitForExpectations(timeout: 60) { error in
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+            }
+        }
     }
+    
+    // Run code below once you've added a custom paged URL to the resource
+//        func testValidNextPage() {
+//            let asyncExpectation = expectation(description: "async")
+//    
+//            let resource = JANetworkingResource<String>(method: .GET, url: URL(string:"<CUSTOM PAGED URL>")!, headers: nil, params: nil, parseJSON: { json in
+//                return (json as! JSONDictionary).debugDescription
+//            })
+//            let nextAvailable = JANetworking.isNextPageAvailable(for: resource)
+//            XCTAssertTrue(nextAvailable)  // Should always return true on first attempt
+//    
+//            JANetworking.loadPagedJSON(resource: resource) { (result, error) in
+//                let nextAvailableAfterLoad = JANetworking.isNextPageAvailable(for: resource)
+//                XCTAssertTrue(nextAvailableAfterLoad)  // Now that the resource has been loaded once, this will check to see if page 2 of the paged resource exists.
+//                let firstResult = result
+//    
+//                JANetworking.loadPagedJSON(resource: resource) { (result, error) in
+//                    XCTAssertNotEqual(firstResult, result)  // Make sure the paged call is actually returning different info for page 1 and page 2
+//    
+//                    JANetworking.loadPagedJSON(resource: resource, pageLimit: 1, completion: { (result, error) in
+//                        let nextAvailableAfterLoad = JANetworking.isNextPageAvailable(for: resource)
+//                        XCTAssertFalse(nextAvailableAfterLoad)  // Since we set a page limit that's below what we've already pulled from the server, this should always fail.
+//                        asyncExpectation.fulfill()
+//                    })
+//    
+//                }
+//    
+//            }
+//    
+//            waitForExpectations(timeout: 60) { error in
+//                if let error = error {
+//                    print("Error: \(error.localizedDescription)")
+//                }
+//            }
+//        }
+    
 }

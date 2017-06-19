@@ -16,6 +16,9 @@
 		745BE32C1D95AA400014BEC2 /* JANetworking.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CDD253CE1D2C16A5009E635F /* JANetworking.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		745BE3311D99B8AF0014BEC2 /* JAImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745BE3301D99B8AF0014BEC2 /* JAImageManager.swift */; };
 		74B0898D1DCBF0E0007CFCFA /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74B0898C1DCBF0E0007CFCFA /* User.swift */; };
+		74DB11A71EF87677004EEE65 /* JANetworkingErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74DB11A61EF87677004EEE65 /* JANetworkingErrorTests.swift */; };
+		74DB11A91EF876A4004EEE65 /* JANetworkingResourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74DB11A81EF876A4004EEE65 /* JANetworkingResourceTests.swift */; };
+		74DB11AB1EF88002004EEE65 /* JANetworkingConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74DB11AA1EF88002004EEE65 /* JANetworkingConfigurationTests.swift */; };
 		CDD253D21D2C16A5009E635F /* JANetworking.h in Headers */ = {isa = PBXBuildFile; fileRef = CDD253D11D2C16A5009E635F /* JANetworking.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CDD253D91D2C16A5009E635F /* JANetworking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDD253CE1D2C16A5009E635F /* JANetworking.framework */; };
 		CDD253DE1D2C16A5009E635F /* JANetworkingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD253DD1D2C16A5009E635F /* JANetworkingTests.swift */; };
@@ -69,6 +72,9 @@
 		744B0F441DD686A700999FA9 /* JAConnectivityManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JAConnectivityManager.swift; sourceTree = "<group>"; };
 		745BE3301D99B8AF0014BEC2 /* JAImageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JAImageManager.swift; sourceTree = "<group>"; };
 		74B0898C1DCBF0E0007CFCFA /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		74DB11A61EF87677004EEE65 /* JANetworkingErrorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JANetworkingErrorTests.swift; sourceTree = "<group>"; };
+		74DB11A81EF876A4004EEE65 /* JANetworkingResourceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JANetworkingResourceTests.swift; sourceTree = "<group>"; };
+		74DB11AA1EF88002004EEE65 /* JANetworkingConfigurationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JANetworkingConfigurationTests.swift; sourceTree = "<group>"; };
 		CDD253CE1D2C16A5009E635F /* JANetworking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JANetworking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDD253D11D2C16A5009E635F /* JANetworking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JANetworking.h; sourceTree = "<group>"; };
 		CDD253D31D2C16A5009E635F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -156,6 +162,9 @@
 			isa = PBXGroup;
 			children = (
 				CDD253DD1D2C16A5009E635F /* JANetworkingTests.swift */,
+				74DB11AA1EF88002004EEE65 /* JANetworkingConfigurationTests.swift */,
+				74DB11A61EF87677004EEE65 /* JANetworkingErrorTests.swift */,
+				74DB11A81EF876A4004EEE65 /* JANetworkingResourceTests.swift */,
 				CDD253DF1D2C16A5009E635F /* Info.plist */,
 			);
 			path = JANetworkingTests;
@@ -349,6 +358,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				CDD253DE1D2C16A5009E635F /* JANetworkingTests.swift in Sources */,
+				74DB11AB1EF88002004EEE65 /* JANetworkingConfigurationTests.swift in Sources */,
+				74DB11A91EF876A4004EEE65 /* JANetworkingResourceTests.swift in Sources */,
+				74DB11A71EF87677004EEE65 /* JANetworkingErrorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

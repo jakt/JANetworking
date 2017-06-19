@@ -9,7 +9,7 @@
 public protocol JANetworkDelegate: class {
     /// Function that will be called anytime a server call is made with an expired or bad token. This method must refresh the token so that it will be valid next time JANetworking calls retries the server call.
     func updateToken(completion: @escaping ((Bool)->Void))
-    /// Function that will be called when updateToken fails to fix the token issue. 
+    /// Function that will be called when updateToken fails to fix the token issue.
     func unauthorizedCallAttempted()
 }
 
