@@ -106,8 +106,7 @@ public final class JANetworkingConfiguration {
     
     // MARK: - Server Calls
     
-    /// Set the number of times a server call tries to refresh the token before failing
-    public static var unauthorizedRetryLimit:Int = 1
+    public private(set) var unauthorizedRetryLimit:Int = 1
     
     public private(set) var configurationHeaders:[String:String] = [:]
 
@@ -116,6 +115,10 @@ public final class JANetworkingConfiguration {
         sharedConfiguration.configurationHeaders[header] = value
     }
     
+    /// Set the number of times a server call tries to refresh the token before failing
+    public class func setUnauthorizedRetryLimit(_ limit:Int) {
+        sharedConfiguration.unauthorizedRetryLimit = limit
+    }
     
     // MARK: - Images
     
@@ -126,18 +129,12 @@ public final class JANetworkingConfiguration {
     
     private var refreshTimer:Timer?
     private var refreshTimerInterval:TimeInterval = 600
-    private var refreshTimerBlock: RefreshTimerBlock?
     
     /// Set the token refresh interval and the block that will trigger anytime the timer completes.
-    /// The refresh timer block should refresh the token, the token refresh is NOT done by the JANetworking library.
-    public class func setUpRefreshTimer(timeInterval:TimeInterval, block:RefreshTimerBlock?) {
-        sharedConfiguration.refreshTimerBlock = block
+    /// When the timer is triggered, it will call the "updateToken" token on the current JANetworkingDelegate. This delegate must be set up for the refresh timer to function properly.
+    public class func setUpRefreshTimer(timeInterval:TimeInterval) {
         sharedConfiguration.refreshTimerInterval = timeInterval
-        if block == nil {
-            sharedConfiguration.refreshTimer?.invalidate()
-        } else {
-            resetRefreshTimer()
-        }
+        resetRefreshTimer()
     }
     
     public class func resetRefreshTimer() {
@@ -146,7 +143,9 @@ public final class JANetworkingConfiguration {
     }
     
     @objc private func refreshTimerFired() {
-        refreshTimerBlock?()
+        JANetworking.delegate?.updateToken(completion: { (success) in
+            //
+        })
     }
     
 }

@@ -6,13 +6,13 @@
 //  Copyright © 2016 JAKT. All rights reserved.
 //
 
-public protocol JANetworkDelegate: class {
+@objc public protocol JANetworkDelegate: class {
     /// Function that will be called anytime a server call is made with an expired or bad token. This method must refresh the token so that it will be valid next time JANetworking calls retries the server call.
     func updateToken(completion: @escaping ((Bool)->Void))
     /// Function that will be called when updateToken fails to fix the token issue.
     func unauthorizedCallAttempted()
     /// Function that will be called when the token status changes
-    func tokenStatusChanged()
+    @objc optional func tokenStatusChanged()
 }
 
 
@@ -32,7 +32,7 @@ public final class JANetworking {
     public static var tokenStatus:TokenStatus? {
         didSet {
             if tokenStatus != oldValue {
-               delegate?.tokenStatusChanged()
+               delegate?.tokenStatusChanged?()
             }
         }
     }
@@ -237,7 +237,7 @@ public final class JANetworking {
         
         if networkError.errorType == .invalidToken {
             // TOKEN IS INVALID. Try to refresh the token and try again. If that fails, call the unauthorizedCallAttempted callback to alert the app.
-            if retryCount <= JANetworkingConfiguration.unauthorizedRetryLimit, let delegate = delegate {
+            if retryCount <= JANetworkingConfiguration.sharedConfiguration.unauthorizedRetryLimit, let delegate = delegate {
                 delegate.updateToken(completion: {(success:Bool) in
                     if success {
                         // Retry the same server call now that the token as been updated.

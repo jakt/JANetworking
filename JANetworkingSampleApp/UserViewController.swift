@@ -45,7 +45,15 @@ class UserViewController: UIViewController {
     func fetchUserDetails() {
         let resource = User.userDetails()
         JANetworking.loadJSON(resource: resource) { (user, error) in
-            guard let user = user else { return }
+            guard let user = user else {
+                if let err:JANetworkingError = error {
+                    print("NETWORK ERROR: \(err.errorType.errorTitle())")
+                    if let data = err.errorData, let code = err.statusCode {
+                        print("Status Code: \(code), Details: \(data)")
+                    }
+                }
+                return
+            }
             self.usernameTextField.text = user.username
             self.phoneTextField.text = "\(user.phoneNumber)"
         }
@@ -69,7 +77,15 @@ class UserViewController: UIViewController {
         
         let resource = User.update(username: username, phone: phoneInt)
         JANetworking.loadJSON(resource: resource) { (user, error) in
-            guard let user = user else { return }
+            guard let user = user else {
+                if let err:JANetworkingError = error {
+                    print("NETWORK ERROR: \(err.errorType.errorTitle())")
+                    if let data = err.errorData, let code = err.statusCode {
+                        print("Status Code: \(code), Details: \(data)")
+                    }
+                }
+                return
+            }
             self.usernameTextField.text = user.username
             self.phoneTextField.text = "\(user.phoneNumber)"
         }

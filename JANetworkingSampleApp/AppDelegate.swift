@@ -17,12 +17,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
-        // Setup for JANetworking
-        JANetworkingConfiguration.setBaseURL(development: "https://<DEV URL>", staging: "https://<STAGING URL>", production: "https://<PROD URL>")
+        // Do all setup for JANetworking. Set URLs, environment, and token storage here.
+        JANetworkingConfiguration.setBaseURL(development: "https://www.devurl.com", staging: "https://www.stagingurl.com", production: "https://www.produrl.com")
         JANetworkingConfiguration.set(environment: .development)
         JANetworkingConfiguration.set(header: "Content-Type", value: "application/json")
         JANetworkingConfiguration.set(header: "Accept", value: "application/json")
-        JANetworkingConfiguration.unauthorizedRetryLimit = 1
+        JANetworkingConfiguration.setUnauthorizedRetryLimit(1)
 
         JANetworkingConfiguration.setLoadToken { () -> (String?) in
             // Try to store to the keychain in actual app. UserDefaults used here simply to persist data between app launches for demonstration purposes
@@ -34,10 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UserDefaults.standard.set(token, forKey: "token")
         }
 
-        JANetworkingConfiguration.setUpRefreshTimer(timeInterval: 300) {
-            print("Refreshing token from refresh timer trigger...")
-            self.refreshToken(completion: nil)
-        }
+        JANetworkingConfiguration.setUpRefreshTimer(timeInterval: 300)
         JANetworking.delegate = self
         
         return true

@@ -6,32 +6,20 @@
 //  Copyright © 2016 JAKT. All rights reserved.
 //
 
-import CoreData
 import JANetworking
 
-public final class User:NSObject {
+public struct User {
     
+    public let id:String
     public var username:String
-    public var id:String
     public var phoneNumber:Int
-    
-    init?(json:JSONDictionary) {
-        guard let username = json["username"] as? String,
-            let id = json["id"] as? String,
-            let phone = json["phone_number"] as? Int else {
-                return nil
-        }
-        self.username = username
-        self.id = id
-        self.phoneNumber = phone
-    }
     
     //login
     public static func login(username: String, password: String) -> JANetworkingResource<User>{
         let url = URL(string: JANetworkingConfiguration.baseURL + "/auth/login/")!
         let params = ["username" : username, "password" : password]
         return JANetworkingResource(method: .POST, url: url, headers: nil, params: params, parseJSON: { json in
-            guard let dictionary = json as? JSONDictionary, let userDictionary = dictionary["user"] as? JSONDictionary else {return nil}
+            guard let userDictionary = json as? JSONDictionary else {return nil}
             // Parse and save server info here! If using core data, pass in the ManagedObjectContext and save the data in this block.
             return User(json: userDictionary)
         })
@@ -42,7 +30,7 @@ public final class User:NSObject {
         let url = URL(string: JANetworkingConfiguration.baseURL + "/auth/registration/")!
         let params = ["username": username, "password": password]
         return JANetworkingResource(method: .POST, url: url, headers: nil, params: params, parseJSON: { json in
-            guard let dictionary = json as? JSONDictionary, let userDictionary = dictionary["user"] as? JSONDictionary else { return nil }
+            guard let userDictionary = json as? JSONDictionary else { return nil }
             // Parse and save server info here! If using core data, pass in the ManagedObjectContext and save the data in this block.
             return User(json: userDictionary)
         })
@@ -75,6 +63,22 @@ public final class User:NSObject {
             guard let dictionary = json as? JSONDictionary else { return nil }
             return User(json: dictionary)
         })
+    }
+
+}
+
+extension User {
+    
+    // Define this function in an extension to not override the default initializer
+    init?(json:JSONDictionary) {
+        guard let username = json["username"] as? String,
+            let id = json["id"] as? String,
+            let phone = json["phone_number"] as? Int else {
+                return nil
+        }
+        self.username = username
+        self.id = id
+        self.phoneNumber = phone
     }
 
 }

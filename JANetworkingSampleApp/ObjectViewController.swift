@@ -32,7 +32,15 @@ class ObjectViewController: UIViewController {
     
     func fetchAll() {
         JANetworking.loadJSON(resource: Post.all()) { (posts, error) in
-            guard let posts = posts else { return }
+            guard let posts = posts else {
+                if let err:JANetworkingError = error {
+                    print("NETWORK ERROR: \(err.errorType.errorTitle())")
+                    if let data = err.errorData, let code = err.statusCode {
+                        print("Status Code: \(code), Details: \(data)")
+                    }
+                }
+                return
+            }
             self.posts = posts
         }
     }

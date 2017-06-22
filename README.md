@@ -1,7 +1,10 @@
 
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
+![Platform: iOS 8+](https://img.shields.io/badge/platform-iOS%208%2B-blue.svg?style=flat)
+[![Language: Swift 3](https://img.shields.io/badge/language-swift%203-4BC51D.svg?style=flat)](https://developer.apple.com/swift)
+![License: MIT](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)
 
-JANetworking is the JAKT internal Networking library for Swift iOS projects.
+JANetworking is the JAKT internal networking library for Swift iOS projects.
 
 
 ## Installation
@@ -19,7 +22,7 @@ $ brew install carthage
 To integrate JANetowrking into your Xcode project using Carthage, specify it in your `Cartfile`:
 
 ```ogdl
-git "git@github.com:jakt/JANetworking.git" ~> 1.0
+github "jakt/JANetworking.git"
 ```
 
 Run `carthage` to build the framework and drag the built `JANetworking.framework` into your Xcode project.
@@ -28,153 +31,128 @@ Run `carthage` to build the framework and drag the built `JANetworking.framework
 
 | JANetworking Version | Minimum iOS Target |
 |:--------------------:|:---------------------------:|
-| 1.x | iOS 9 |
+| 1.x | iOS 8 |
 
 ---
 
 ## Usage
-JANetworking usage architecture are mostly define in the model object itself.  
-For example, I will be using a model type called `Post`
+Much of the JANetworking integration will be in the object's own code.  
+For our example we'll use a model type called `Post`
 
 ### Models
 ```
 struct Post {
     let id: Int
-    let userName: String
     var title: String
     var body: String
+    let authorId: String
 }
 ```
-
-Extend this struct model to add an init method so that the original init wont get overriden
+Extend this struct model to add an init method so that the default init wont be overridden
 ```
 extension Post {
-    init?(dictionary: [String: AnyObject]){
+    init?(dictionary: [String: Any?]){
         guard let id = dictionary["id"] as? Int,
-            title = dictionary["title"] as? String,
-            userName = dictionary["user_name"] as? String,
-            body = dictionary["body"] as? String else { return nil }
+            let title = dictionary["title"] as? String,
+            let body = dictionary["body"] as? String,
+            let authorId = dictionary["author_id"] as? String else { return nil }
         
         self.id = id
-        self.userName = userName
         self.title = title
         self.body = body
+        self.authorId = authorId
     }
 }
 ```
 
-Now we need to add the rest of the methods in the `Post extension` that we want for calling the server. All methods must return a resource generic object type. For my example, I have created 2 endpoints:  
-`Post.all`: Fetches all the post objects from the server. Make sure this method is `static` so that it can be use without instantiating the Object.   
-`Post.submit`: Creates a post object in the server. This does not need to be `static` because it requires you to instantiate the object itself in order to use it. 
+We can now add all server calls to the `Post` object. For our example, we've created 2 endpoints:  
+`Post.all`: Fetches all the post objects from the server. This function is `static` so that it can be use without instantiating the object.   
+`Post.submit`: Creates a post object on the server. This does not need to be `static` because it requires the object itself to pull the required info.
+All methods must return a resource generic object type.
 ```
     ....
     
-    // Get all post
-    static func all(headers: [String: String]?) -> JANetworkingResource<[Post]>{
-        let url = NSURL(string: baseUrl + "/posts")!
-        return JANetworkingResource(method: .GET, url: url, headers: headers, params: nil, parseJSON: { json in
-            guard let dictionaries = json as? [JSONDictionary] else { return nil }
-            return dictionaries.flatMap(Post.init)
+    /// Fetch all posts
+    public static func all() -> JANetworkingResource<[Post]> {
+        let url = URL(string: JANetworkingConfiguration.baseURL + "/posts")!
+        return JANetworkingResource(method: .GET, url: url, headers: nil, params: nil, parseJSON: { json in
+            guard let items = json as? [JSONDictionary] else { return nil }
+            let posts = items.flatMap(Post.init)
+            return posts
         })
     }
     
     // Submit a post
-    func submit(headers: [String: String]?) -> JANetworkingResource<Post>{
-        let url = NSURL(string: baseUrl + "/posts")!
+    public func submit() -> JANetworkingResource<Post>{
+        let url = URL(string: JANetworkingConfiguration.baseURL + "/posts")!
         let params:JSONDictionary = ["id": id,
-                                     "userName": userName,
+                                     "author": authorId,
                                      "title": title,
                                      "body": body]
-        return JANetworkingResource(method: .POST, url: url, headers: headers, params: params, parseJSON: { json in
+        return JANetworkingResource(method: .POST, url: url, headers: nil, params: params, parseJSON: { json in
             guard let dictionary = json as? JSONDictionary else { return nil }
-            return Post(dictionary: dictionary)
+            return Post(json: dictionary)
         })
     }
 ```
 ### JANetworking
-`JANetworking.loadJSON` takes in resource generic type and a completion block. Using `JANetworking.loadJSON` will automatically detect the **[JANetworkingError](#JANetworkingError)**  from our stack
+`JANetworking.loadJSON` takes in a resource generic type and a completion block. Using `JANetworking.loadJSON` will automatically detect the **[JANetworkingError](/JANetworking/JANetworking.swift)**  from our stack
 
 Finally on your `ViewController`. You can call:  
 #### Get All Post
 ```
-let headers = ["Authorization": "SomeTokenValue"] // Add header example
-JANetworking.loadJSON(Post.all(headers)) { data, error in
+JANetworking.loadJSON(Post.all()) { data, error in
     if let err = error {
-        print("`Post.all` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
-        print("`Post.all` - ERROR: \(err.errorData)")
-    }else{
-        if let data = data {
-            print("`Post.all` - SUCCESS: \(data)")
-        }
+        print("`Post.all` - ERROR: \(err.statusCode ?? 0) - \(err.errorType.errorTitle())")
+    } else if let data = data {
+        print("`Post.all` - SUCCESS: \(data)")
     }
 }
 ```
 #### Create a Post
 ```
-var post = Post(id: 100, userName: "Enrique W", title: "My Title", body: "Some Message Here.")
+var post = Post(id: 100, title: "My Title", body: "Some Message Here.", authorId:"199")
 JANetworking.loadJSON(post.submit(headers)) { data, error in
     if let err = error {
         print("`Post.submit` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
-        print("`Post.submit` - ERROR: \(err.errorData)")
-    }else{
-        if let data = data {
-            print("`Post.submit` - SUCCESS: \(data)")
-        }
+    } else if let data = data {
+        print("`Post.submit` - SUCCESS: \(data)")
     }
 }
 ```
-### JANetworkingError
-There are 2 types of error: NSError, Response Error. You can access to the error data in the JANetworkingError object. `JANetworkingError.errorData`. Example:
-```
-if let err = error {
-    print("`Post.submit` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
-    print("`Post.submit` - ERROR: \(err.errorData)")
-}
-```
-#### NSError
-- This error occurs when `dataTaskWithRequest` returns an NSError, which is unrelated to the reponse error. This means that the request has failed.
 
-#### Reponse Error
- - This occurs when the `dataTaskWithRequest` returns success, However the reponse is within the range of status code ERROR (4xx or 5xx)
-
-#### JAError
-JAError contains property, `JAError.field`, `JAError.message`  
- You can access to the error object in `err.errorData` which returns an Array of JAError. 
- 
 ### JANetworkingConfiguration
-You can configure the behavior of requests by using `JANetworkConfiguration`  
+Before using JANetworking you must first configure the library to work with your specific back end. This configuration is done using the `JANetworkConfiguration` object.
+There are a few settings that should be configured on app launch that will be default settings for all server calls. Below is a list of everything that should be set:
+- `setBaseURL(development:String, staging:String, production:String)` - Set the URLs for all environments
+- `set(environment:NetworkEnvironment)` - Set the current environment
 
 - `set(header:String, value:String?)` - Set the request headers for network requests
 - `setSaveToken(block:SaveTokenBlock)` - Customize how the token is saved
 - `setLoadToken(block:LoadTokenBlock)` - Customize how the token is loaded
+- `setInvalidTokenInfo(serverResponseText:[String], HTTPStatusCodes:[Int])` - Set the triggers for an invalid token. If any server call matches any of the info passed in here, it will trigger a token refresh.
+- `setUnauthorizedRetryLimit(_ limit:Int)` - Set the number of times the token should attempt to refresh before the server call fails.
+- `setUpRefreshTimer(timeInterval:TimeInterval)` - Set the refresh interval for the token
 
-- `setUpRefreshTimer(timeInterval:NSTimeInterval, block:RefreshTimerBlock?)`- Sets how often the token should be refreshed and how it should be handled
-
-### Downloading image
-There are two ways to download an image:
-#### ImageView Extension
-`imageView.downloadImage(url: String, placeholder: UIImage? = nil)`  
+### JANetworkingError
+If any issues arise during a server call a `JANetworkingError` object will be created. This object includes the status code, an easily readable `errorType`, and more detailed `errorData`. Example:
 ```
-@IBOutlet var imageView: UIImageView!
-...
-// Download image with imageview extension
-let placeholder = UIImage(named: "placeholder")
-imageView.setupImage("http://www.flooringvillage.co.uk/ekmps/shops/flooringvillage/images/request-a-sample--547-p.jpg", placeholder: placeholder)
-        
-```
-#### JANetworking Image Download
-`JANetworking.loadImage(url: String, completion:(UIImage?, error: JANetworkingError?) -> ())`   
-```
-// Normal download image
-JANetworking.loadImage("https://www.ricoh.com/r_dc/cx/cx1/img/sample_04.jpg") { (image, error) in
-    if let err = error {
-        print("`Load.image` - ERROR: \(err.statusCode) \(err.errorType.errorTitle())")
-        print("`Load.image` - ERROR: \(err.errorData)")
-    }else{
-        if let img = image {
-            print("`Load.image` - SUCCESS: \(img)")
-            self.imageView2.image = img
-        }
+if let err:JANetworkingError = error {
+    print("NETWORK ERROR: \(err.errorType.errorTitle())")
+    if let data = err.errorData, let code = err.statusCode {
+        print("Status Code: \(code), Details: \(data)")
     }
 }
 ```
+Errors that can trigger the creation of a valid JANetworkingError object include an `NSError` and response errors parsed from either the `URLResponse` or the response `Data` object itself.
+#### NSError
+- This error occurs when `dataTaskWithRequest` returns an NSError, which is unrelated to the reponse error. This means that the request has failed.
+
+#### Reponse Error
+ - This occurs when the `dataTaskWithRequest` returns successfully, however the reponse is within the range of status code ERROR (4xx or 5xx)
+ - This can also occur when the server call is successful but the JSON packet received includes an `error` key that has valid information that can be parsed.
+
+#### JAError
+JAError contains properties `JAError.field` and `JAError.message`  
+You can access this information through the JANetworkingError property `err.errorData` which returns an Array of JAError objects. 
+ 
