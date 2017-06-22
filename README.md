@@ -68,7 +68,6 @@ extension Post {
 We can now add all server calls to the `Post` object. For our example, we've created 2 endpoints:  
 `Post.all`: Fetches all the post objects from the server. This function is `static` so that it can be use without instantiating the object.   
 `Post.submit`: Creates a post object on the server. This does not need to be `static` because it requires the object itself to pull the required info.
-All methods must return a resource generic object type.
 ```
     ....
     
@@ -95,15 +94,16 @@ All methods must return a resource generic object type.
         })
     }
 ```
+All methods must return a resource generic object type.
 ### JANetworking
-`JANetworking.loadJSON` takes in a resource generic type and a completion block. Using `JANetworking.loadJSON` will automatically detect the **[JANetworkingError](/JANetworking/JANetworking.swift)**  from our stack
+`JANetworking.loadJSON` takes in a resource generic type and a completion block. Using `JANetworking.loadJSON` will automatically detect the **[JANetworkingError](/JANetworking/JANetworkingError.swift)**  from our stack
 
 Finally on your `ViewController`. You can call:  
-#### Get All Post
+#### Get All Posts
 ```
 JANetworking.loadJSON(Post.all()) { data, error in
     if let err = error {
-        print("`Post.all` - ERROR: \(err.statusCode ?? 0) - \(err.errorType.errorTitle())")
+        print("`Post.all` - NETWORK ERROR: \(err.errorType.errorTitle())")
     } else if let data = data {
         print("`Post.all` - SUCCESS: \(data)")
     }
@@ -111,10 +111,10 @@ JANetworking.loadJSON(Post.all()) { data, error in
 ```
 #### Create a Post
 ```
-var post = Post(id: 100, title: "My Title", body: "Some Message Here.", authorId:"199")
+let post = Post(id: 100, title: "My Title", body: "Some Message Here.", authorId:"199")
 JANetworking.loadJSON(post.submit(headers)) { data, error in
     if let err = error {
-        print("`Post.submit` - ERROR: \(err.statusCode) - \(err.errorType.errorTitle())")
+        print("`PPost.submit` - NETWORK ERROR: \(err.errorType.errorTitle())")
     } else if let data = data {
         print("`Post.submit` - SUCCESS: \(data)")
     }
@@ -122,14 +122,17 @@ JANetworking.loadJSON(post.submit(headers)) { data, error in
 ```
 
 ### JANetworkingConfiguration
-Before using JANetworking you must first configure the library to work with your specific back end. This configuration is done using the `JANetworkConfiguration` object.
-There are a few settings that should be configured on app launch that will be default settings for all server calls. Below is a list of everything that should be set:
+Before using JANetworking you must first configure the library to work with your specific server. This configuration is done using the `JANetworkConfiguration` object.
+There are a few settings that should be configured on app launch that will be the default settings for all server calls. Below is a list of everything that can be set:
+
+#### Required
 - `setBaseURL(development:String, staging:String, production:String)` - Set the URLs for all environments
 - `set(environment:NetworkEnvironment)` - Set the current environment
-
-- `set(header:String, value:String?)` - Set the request headers for network requests
 - `setSaveToken(block:SaveTokenBlock)` - Customize how the token is saved
 - `setLoadToken(block:LoadTokenBlock)` - Customize how the token is loaded
+
+#### Optional
+- `set(header:String, value:String?)` - Set the request headers for network requests
 - `setInvalidTokenInfo(serverResponseText:[String], HTTPStatusCodes:[Int])` - Set the triggers for an invalid token. If any server call matches any of the info passed in here, it will trigger a token refresh.
 - `setUnauthorizedRetryLimit(_ limit:Int)` - Set the number of times the token should attempt to refresh before the server call fails.
 - `setUpRefreshTimer(timeInterval:TimeInterval)` - Set the refresh interval for the token
