@@ -8,13 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		45AD782A1D357174007E7CFF /* JANetworkingConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AD78291D357174007E7CFF /* JANetworkingConfiguration.swift */; };
-		7435F96E1D66173E00C55872 /* Gif.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7435F96D1D66173E00C55872 /* Gif.swift */; };
+		7407B2AB1EFB268C00C78712 /* UserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7407B2AA1EFB268C00C78712 /* UserViewController.swift */; };
+		7415938C1EF9C27000FBAE6A /* ObjectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7415938B1EF9C27000FBAE6A /* ObjectViewController.swift */; };
 		744B0F401DD66A1000999FA9 /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744B0F3F1DD66A1000999FA9 /* Post.swift */; };
 		744B0F451DD686A700999FA9 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744B0F431DD686A700999FA9 /* Reachability.swift */; };
 		744B0F461DD686A700999FA9 /* JAConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744B0F441DD686A700999FA9 /* JAConnectivityManager.swift */; };
 		745BE32B1D95AA400014BEC2 /* JANetworking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDD253CE1D2C16A5009E635F /* JANetworking.framework */; };
 		745BE32C1D95AA400014BEC2 /* JANetworking.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CDD253CE1D2C16A5009E635F /* JANetworking.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		745BE3311D99B8AF0014BEC2 /* JAImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745BE3301D99B8AF0014BEC2 /* JAImageManager.swift */; };
 		74B0898D1DCBF0E0007CFCFA /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74B0898C1DCBF0E0007CFCFA /* User.swift */; };
 		74DB11A71EF87677004EEE65 /* JANetworkingErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74DB11A61EF87677004EEE65 /* JANetworkingErrorTests.swift */; };
 		74DB11A91EF876A4004EEE65 /* JANetworkingResourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74DB11A81EF876A4004EEE65 /* JANetworkingResourceTests.swift */; };
@@ -25,12 +25,10 @@
 		CDD253E91D2C16D0009E635F /* JANetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD253E81D2C16D0009E635F /* JANetworking.swift */; };
 		CDD253EB1D2C171C009E635F /* JANetworkingResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD253EA1D2C171C009E635F /* JANetworkingResource.swift */; };
 		CDD253F61D2C1DEF009E635F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD253F51D2C1DEF009E635F /* AppDelegate.swift */; };
-		CDD253F81D2C1DEF009E635F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD253F71D2C1DEF009E635F /* ViewController.swift */; };
 		CDD253FB1D2C1DEF009E635F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CDD253F91D2C1DEF009E635F /* Main.storyboard */; };
 		CDD253FD1D2C1DEF009E635F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CDD253FC1D2C1DEF009E635F /* Assets.xcassets */; };
 		CDD254001D2C1DEF009E635F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CDD253FE1D2C1DEF009E635F /* LaunchScreen.storyboard */; };
 		CDD254061D2C39B3009E635F /* JANetworkingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD254051D2C39B3009E635F /* JANetworkingError.swift */; };
-		CDD254131D2C4873009E635F /* PostTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD254121D2C4873009E635F /* PostTest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,12 +64,12 @@
 
 /* Begin PBXFileReference section */
 		45AD78291D357174007E7CFF /* JANetworkingConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JANetworkingConfiguration.swift; sourceTree = "<group>"; };
-		7435F96D1D66173E00C55872 /* Gif.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gif.swift; sourceTree = "<group>"; };
-		744B0F3F1DD66A1000999FA9 /* Post.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
+		7407B2AA1EFB268C00C78712 /* UserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserViewController.swift; sourceTree = "<group>"; };
+		7415938B1EF9C27000FBAE6A /* ObjectViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectViewController.swift; sourceTree = "<group>"; };
+		744B0F3F1DD66A1000999FA9 /* Post.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Post.swift; path = ../JANetworkingSampleApp/Post.swift; sourceTree = "<group>"; };
 		744B0F431DD686A700999FA9 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		744B0F441DD686A700999FA9 /* JAConnectivityManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JAConnectivityManager.swift; sourceTree = "<group>"; };
-		745BE3301D99B8AF0014BEC2 /* JAImageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JAImageManager.swift; sourceTree = "<group>"; };
-		74B0898C1DCBF0E0007CFCFA /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		74B0898C1DCBF0E0007CFCFA /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = User.swift; path = ../JANetworkingSampleApp/User.swift; sourceTree = "<group>"; };
 		74DB11A61EF87677004EEE65 /* JANetworkingErrorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JANetworkingErrorTests.swift; sourceTree = "<group>"; };
 		74DB11A81EF876A4004EEE65 /* JANetworkingResourceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JANetworkingResourceTests.swift; sourceTree = "<group>"; };
 		74DB11AA1EF88002004EEE65 /* JANetworkingConfigurationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JANetworkingConfigurationTests.swift; sourceTree = "<group>"; };
@@ -85,13 +83,11 @@
 		CDD253EA1D2C171C009E635F /* JANetworkingResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JANetworkingResource.swift; sourceTree = "<group>"; };
 		CDD253F31D2C1DEF009E635F /* JANetworkingSampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JANetworkingSampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDD253F51D2C1DEF009E635F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		CDD253F71D2C1DEF009E635F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		CDD253FA1D2C1DEF009E635F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		CDD253FC1D2C1DEF009E635F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CDD253FF1D2C1DEF009E635F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CDD254011D2C1DEF009E635F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CDD254051D2C39B3009E635F /* JANetworkingError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JANetworkingError.swift; sourceTree = "<group>"; };
-		CDD254121D2C4873009E635F /* PostTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PostTest.swift; path = JANetworkingSampleApp/PostTest.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,8 +146,6 @@
 				45AD78291D357174007E7CFF /* JANetworkingConfiguration.swift */,
 				CDD253EA1D2C171C009E635F /* JANetworkingResource.swift */,
 				CDD254051D2C39B3009E635F /* JANetworkingError.swift */,
-				7435F96D1D66173E00C55872 /* Gif.swift */,
-				745BE3301D99B8AF0014BEC2 /* JAImageManager.swift */,
 				744B0F431DD686A700999FA9 /* Reachability.swift */,
 				744B0F441DD686A700999FA9 /* JAConnectivityManager.swift */,
 			);
@@ -173,7 +167,8 @@
 		CDD253EC1D2C193C009E635F /* Mock Models */ = {
 			isa = PBXGroup;
 			children = (
-				CDD254121D2C4873009E635F /* PostTest.swift */,
+				74B0898C1DCBF0E0007CFCFA /* User.swift */,
+				744B0F3F1DD66A1000999FA9 /* Post.swift */,
 			);
 			name = "Mock Models";
 			path = ../JANetworkingTests;
@@ -184,9 +179,8 @@
 			children = (
 				CDD253EC1D2C193C009E635F /* Mock Models */,
 				CDD253F51D2C1DEF009E635F /* AppDelegate.swift */,
-				74B0898C1DCBF0E0007CFCFA /* User.swift */,
-				744B0F3F1DD66A1000999FA9 /* Post.swift */,
-				CDD253F71D2C1DEF009E635F /* ViewController.swift */,
+				7415938B1EF9C27000FBAE6A /* ObjectViewController.swift */,
+				7407B2AA1EFB268C00C78712 /* UserViewController.swift */,
 				CDD253F91D2C1DEF009E635F /* Main.storyboard */,
 				CDD253FC1D2C1DEF009E635F /* Assets.xcassets */,
 				CDD253FE1D2C1DEF009E635F /* LaunchScreen.storyboard */,
@@ -346,10 +340,8 @@
 				CDD253E91D2C16D0009E635F /* JANetworking.swift in Sources */,
 				45AD782A1D357174007E7CFF /* JANetworkingConfiguration.swift in Sources */,
 				CDD254061D2C39B3009E635F /* JANetworkingError.swift in Sources */,
-				745BE3311D99B8AF0014BEC2 /* JAImageManager.swift in Sources */,
 				744B0F461DD686A700999FA9 /* JAConnectivityManager.swift in Sources */,
 				CDD253EB1D2C171C009E635F /* JANetworkingResource.swift in Sources */,
-				7435F96E1D66173E00C55872 /* Gif.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -369,10 +361,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				74B0898D1DCBF0E0007CFCFA /* User.swift in Sources */,
-				CDD254131D2C4873009E635F /* PostTest.swift in Sources */,
-				CDD253F81D2C1DEF009E635F /* ViewController.swift in Sources */,
+				7407B2AB1EFB268C00C78712 /* UserViewController.swift in Sources */,
 				CDD253F61D2C1DEF009E635F /* AppDelegate.swift in Sources */,
 				744B0F401DD66A1000999FA9 /* Post.swift in Sources */,
+				7415938C1EF9C27000FBAE6A /* ObjectViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

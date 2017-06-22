@@ -11,21 +11,31 @@ public protocol JANetworkDelegate: class {
     func updateToken(completion: @escaping ((Bool)->Void))
     /// Function that will be called when updateToken fails to fix the token issue.
     func unauthorizedCallAttempted()
+    /// Function that will be called when the token status changes
+    func tokenStatusChanged()
 }
 
 
 import Foundation
 
+public enum TokenStatus {
+    case invalidRefreshedSuccessfully
+    case invalidCantRefresh
+    case valid
+}
+
 public final class JANetworking {
-    
-    private enum TokenStatus {
-        case invalidRefreshedSuccessfully
-        case invalidCantRefresh
-        case valid
-    }
     
     private static let noMorePagesIdentifier = "No more pages"
     weak public static var delegate:JANetworkDelegate?
+    
+    public static var tokenStatus:TokenStatus? {
+        didSet {
+            if tokenStatus != oldValue {
+               delegate?.tokenStatusChanged()
+            }
+        }
+    }
     
     // Var where all paginated urls are stored
     private static var nextPageUrl:[String:String] = [:]
@@ -166,14 +176,17 @@ public final class JANetworking {
                         switch tokenStatus {
                         case .invalidRefreshedSuccessfully:
                             // Retry the same server call now that the token as been updated.
+                            self.tokenStatus = tokenStatus
                             let count = retryCount + 1
                             createServerCall(resource: resource, useNextPage:useNextPage, retryCount: count, completion: completion)
                         case .invalidCantRefresh:
                             // The server call failed because of token issues but was unable to resolve itself.
+                            self.tokenStatus = tokenStatus
                             completion(nil, networkError)
                         case .valid:
                             // This error is NOT token related. Return the error as normal.
                             completion(nil, networkError)
+                            // Token status is NOT being updated here because the an error occurred during the server call which means the token may not have even been validated yet.
                         }
                     })
                 }else{
@@ -190,13 +203,19 @@ public final class JANetworking {
                         switch tokenStatus {
                         case .invalidRefreshedSuccessfully:
                             // Retry the same server call now that the token as been updated.
+                            self.tokenStatus = tokenStatus
                             let count = retryCount + 1
                             createServerCall(resource: resource, useNextPage:useNextPage, retryCount: count, completion: completion)
                         case .invalidCantRefresh:
                             // The server call failed because of token issues but was unable to resolve itself.
+                            self.tokenStatus = tokenStatus
                             completion(results, networkError)
                         case .valid:
                             // Server call was successful and token is valid. There still may be a valid non-token related error being returned here. This is where all successful server calls return data. For paginated server calls, save the next page URL if it's returned.
+                            if networkError == nil {
+                                // Token status is only updated if there is NO error. If there is an error, the token may not be validated yet.
+                                self.tokenStatus = tokenStatus
+                            }
                             saveNextPage(for: resource, data: data)
                             completion(results, networkError)
                         }

@@ -27,9 +27,9 @@ public class JAConnectivityManager {
             // be on the main thread, like this:
             DispatchQueue.main.async {
                 if reachability.isReachableViaWiFi {
-                    print("NOTIFIER: Reachable via WiFi")
+//                    print("NOTIFIER: Reachable via WiFi")
                 } else {
-                    print("NOTIFIER: Reachable via Cellular")
+//                    print("NOTIFIER: Reachable via Cellular")
                 }
                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: regainSignalNotifcationName), object: nil)
                 regainConnectionBlock?()
@@ -39,7 +39,7 @@ public class JAConnectivityManager {
             // this is called on a background thread, but UI updates must
             // be on the main thread, like this:
             DispatchQueue.main.async {
-                print("NOTIFIER: Not reachable")
+//                print("NOTIFIER: Not reachable")
                 // Post notification for any controller to modify for no connection
                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: noSignalNotifcationName), object: nil)
                 loseConnectionBlock?()
@@ -58,7 +58,6 @@ public class JAConnectivityManager {
         let networkStatus = reachability?.currentReachabilityStatus
         
         if(networkStatus == Reachability.NetworkStatus.notReachable){
-            print("User has NO CONNECTION")
             return false
         }
         return true

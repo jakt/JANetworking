@@ -27,7 +27,7 @@ public final class User:NSObject {
     }
     
     //login
-    public static func login(username: String, password: String) -> JANetworkingResource<User?>{
+    public static func login(username: String, password: String) -> JANetworkingResource<User>{
         let url = URL(string: JANetworkingConfiguration.baseURL + "/auth/login/")!
         let params = ["username" : username, "password" : password]
         return JANetworkingResource(method: .POST, url: url, headers: nil, params: params, parseJSON: { json in
@@ -38,7 +38,7 @@ public final class User:NSObject {
     }
     
     // Register
-    static func register(username: String, password: String) -> JANetworkingResource<User?>{
+    static func register(username: String, password: String) -> JANetworkingResource<User>{
         let url = URL(string: JANetworkingConfiguration.baseURL + "/auth/registration/")!
         let params = ["username": username, "password": password]
         return JANetworkingResource(method: .POST, url: url, headers: nil, params: params, parseJSON: { json in
@@ -48,19 +48,8 @@ public final class User:NSObject {
         })
     }
     
-    // Update User Phone
-    func updatePhoneNumber(newNumber:String) -> JANetworkingResource<User?>{
-        let url = URL(string: JANetworkingConfiguration.baseURL + "/auth/user/")!
-        let params:[String:Any?] = ["first_name": nil, "last_name": nil, "middle_initial": nil, "username": nil, "phone_number": newNumber]
-        return JANetworkingResource(method: .PUT, url: url, headers: nil, params: params, parseJSON: { json in
-            guard let userDictionary = json as? JSONDictionary else { return nil }
-            // Parse and save server info here! If using core data, pass in the ManagedObjectContext and save the data in this block.
-            return User(json: userDictionary)
-        })
-    }
-    
     // Refresh token
-    static func refreshToken(_ token: String) -> JANetworkingResource<String?> {
+    static func refreshToken(_ token: String) -> JANetworkingResource<String> {
         let url = URL(string: JANetworkingConfiguration.baseURL + "/token-refresh/")!
         let params = ["token": token]
         return JANetworkingResource(method: .POST, url: url, headers: nil, params: params, parseJSON: { json in
@@ -70,12 +59,21 @@ public final class User:NSObject {
     }
     
     // Fetch user data
-    static func userDetails() -> JANetworkingResource<User?>{
+    static func userDetails() -> JANetworkingResource<User>{
         let url = URL(string: JANetworkingConfiguration.baseURL + "/auth/user/")!
         return JANetworkingResource(method: .GET, url: url, headers: nil, params: nil, parseJSON: { json in
             guard let dictionary = json as? JSONDictionary else { return nil }
             return User(json: dictionary)
-
+        })
+    }
+    
+    // Update user data
+    static func update(username:String, phone:Int) -> JANetworkingResource<User>{
+        let url = URL(string: JANetworkingConfiguration.baseURL + "/auth/user/")!
+        let params:JSONDictionary = ["username":username, "phone_number":phone]
+        return JANetworkingResource(method: .POST, url: url, headers: nil, params: params, parseJSON: { json in
+            guard let dictionary = json as? JSONDictionary else { return nil }
+            return User(json: dictionary)
         })
     }
 

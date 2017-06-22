@@ -9,30 +9,33 @@
 import UIKit
 import JANetworking
 
-@UIApplicationMain
+let tokenStatusNotificationName = NSNotification.Name.init("TokenStatusChanged")
 
+@UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
         // Setup for JANetworking
-        JANetworkingConfiguration.setBaseURL(development: "https://rdv-development.herokuapp.com/api", staging: "https://rdv-staging.herokuapp.com/api", production: "https://rdv-prod.herokuapp.com/api")
+        JANetworkingConfiguration.setBaseURL(development: "https://<DEV URL>", staging: "https://<STAGING URL>", production: "https://<PROD URL>")
         JANetworkingConfiguration.set(environment: .development)
         JANetworkingConfiguration.set(header: "Content-Type", value: "application/json")
         JANetworkingConfiguration.set(header: "Accept", value: "application/json")
         JANetworkingConfiguration.unauthorizedRetryLimit = 1
 
         JANetworkingConfiguration.setLoadToken { () -> (String?) in
+            // Try to store to the keychain in actual app. UserDefaults used here simply to persist data between app launches for demonstration purposes
             return UserDefaults.standard.object(forKey: "token") as? String
         }
         
         JANetworkingConfiguration.setSaveToken { (token) in
+            // Try to store to the keychain in actual app. UserDefaults used here simply to persist data between app launches for demonstration purposes
             UserDefaults.standard.set(token, forKey: "token")
         }
 
-        JANetworkingConfiguration.setUpRefreshTimer(timeInterval: 30) {
-            print("refreshing token...")
+        JANetworkingConfiguration.setUpRefreshTimer(timeInterval: 300) {
+            print("Refreshing token from refresh timer trigger...")
             self.refreshToken(completion: nil)
         }
         JANetworking.delegate = self
@@ -62,6 +65,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
     
+    
+    
+    // MARK: - Custom Functions
+    
     func refreshToken(completion:((Bool)->Void)?) {
         // Auto log user in using the user credential saved in the keychain
         // Would recommend saving the user's login info to the keychain and fetching it here
@@ -79,7 +86,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         })
     }
+    
 }
+
+
+
+// MARK: - JANetworkDelegate Functions
 
 extension AppDelegate:JANetworkDelegate {
     func updateToken(completion: @escaping ((Bool) -> Void)) {
@@ -91,6 +103,10 @@ extension AppDelegate:JANetworkDelegate {
     func unauthorizedCallAttempted() {
         // Add any code here to handle when an authorized user is trying to make a server call.
         print("unauthorized call attempted")
+    }
+    
+    func tokenStatusChanged() {
+        NotificationCenter.default.post(name: tokenStatusNotificationName, object: nil, userInfo: nil)
     }
 }
 

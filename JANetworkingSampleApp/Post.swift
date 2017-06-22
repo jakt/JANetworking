@@ -32,8 +32,8 @@ public class Post:NSObject {
         self.authorId = authorId
     }
     
-    //get all posts with now filter
-    public static func postWithId(_ id:String) -> JANetworkingResource<Post?> {
+    /// Fetch a specific post from the server
+    public static func postWithId(_ id:String) -> JANetworkingResource<Post> {
         let url = URL(string: JANetworkingConfiguration.baseURL + "/posts/")!
         let params:JSONDictionary = ["post_id": id]
         return JANetworkingResource(method: .GET, url: url, headers: nil, params: params, parseJSON: { json in
@@ -42,7 +42,8 @@ public class Post:NSObject {
         })
     }
     
-    public static func all() -> JANetworkingResource<[Post]?> {
+    /// Fetch all posts
+    public static func all() -> JANetworkingResource<[Post]> {
         let url = URL(string: JANetworkingConfiguration.baseURL + "/posts/")!
         return JANetworkingResource(method: .GET, url: url, headers: nil, params: nil, parseJSON: { json in
             guard let dictionary = json as? JSONDictionary, let items = dictionary["results"] as? [JSONDictionary] else { return nil }
@@ -51,7 +52,20 @@ public class Post:NSObject {
         })
     }
     
-    //like
+    /// Submit a post
+    public static func submit(id:String, title:String, body:String, authorId:String) -> JANetworkingResource<Post>{
+        let url = URL(string: JANetworkingConfiguration.baseURL + "/posts")!
+        let params:JSONDictionary = ["id": id,
+                                     "author": authorId,
+                                     "title": title,
+                                     "body": body]
+        return JANetworkingResource(method: .POST, url: url, headers: nil, params: params, parseJSON: { json in
+            guard let dictionary = json as? JSONDictionary, let postDictionary = dictionary["results"] as? JSONDictionary else { return nil }
+            return Post(json: postDictionary)
+        })
+    }
+    
+    /// Like a post
     public static func like(postID : String) -> JANetworkingResource<Bool> {
         let url = URL(string: JANetworkingConfiguration.baseURL + "/posts/like/")!
         let params = ["post" : postID]
@@ -61,7 +75,7 @@ public class Post:NSObject {
         })
     }
     
-    //unlike
+    /// Unlike a post
     public static func unlike(postID : String) -> JANetworkingResource<Bool> {
         let url = URL(string: JANetworkingConfiguration.baseURL + "/posts/like/")!
         let params = ["post" : postID]
