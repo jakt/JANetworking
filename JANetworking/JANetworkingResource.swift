@@ -8,7 +8,7 @@
 
 import Foundation
 
-public typealias JSONDictionary = [String: Any]
+public typealias JSONDictionary = [String: Any?]
 
 public enum RequestMethod: String {
     case POST = "POST"
@@ -17,6 +17,8 @@ public enum RequestMethod: String {
     case DELETE = "DELETE"
 }
 
+
+/// Generic struct that is used to fetch resources from the server.
 public struct JANetworkingResource<A>{
     public let id = UUID().uuidString
     public let method: RequestMethod
@@ -28,6 +30,8 @@ public struct JANetworkingResource<A>{
 }
 
 extension JANetworkingResource {
+    /// This is how all JANetworkingResource's should be created. Once configured, the resource is handed into the JANetworking loadJSON function
+    /// parseJSON is where the server data is converted into actual objects.
     public init(method: RequestMethod, url: URL, headers: [String: String]?, params: JSONDictionary?, parseJSON: @escaping (Any) -> A?){
         self.method = method
         self.url = url

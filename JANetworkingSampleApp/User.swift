@@ -6,39 +6,33 @@
 //  Copyright © 2016 JAKT. All rights reserved.
 //
 
-import CoreData
 import JANetworking
 
-public final class User:NSObject {
+public struct User {
     
-    // Login
-    static func login(email: String, password: String) -> JANetworkingResource<User>{
+    public let id:String
+    public var username:String
+    public var phoneNumber:Int
+    
+    //login
+    public static func login(username: String, password: String) -> JANetworkingResource<User>{
         let url = URL(string: JANetworkingConfiguration.baseURL + "/auth/login/")!
-        let params = ["email": email, "password": password]
+        let params = ["username" : username, "password" : password]
         return JANetworkingResource(method: .POST, url: url, headers: nil, params: params, parseJSON: { json in
-            guard let dictionary = json as? JSONDictionary, let userDictionary = dictionary["user"] as? JSONDictionary else { return nil }
-            // Save to locksmith user credentials
-            return nil
+            guard let userDictionary = json as? JSONDictionary else {return nil}
+            // Parse and save server info here! If using core data, pass in the ManagedObjectContext and save the data in this block.
+            return User(json: userDictionary)
         })
     }
     
     // Register
-    static func register(email: String, password: String, accessCode: String) -> JANetworkingResource<User>{
+    static func register(username: String, password: String) -> JANetworkingResource<User>{
         let url = URL(string: JANetworkingConfiguration.baseURL + "/auth/registration/")!
-        let params = ["email": email, "password": password, "code":accessCode]
+        let params = ["username": username, "password": password]
         return JANetworkingResource(method: .POST, url: url, headers: nil, params: params, parseJSON: { json in
-            guard let dictionary = json as? JSONDictionary, let userDictionary = dictionary["user"] as? JSONDictionary else { return nil }
-            return nil
-        })
-    }
-    
-    // Update User Phone
-    func updatePhoneNumber(newNumber:String) -> JANetworkingResource<User>{
-        let url = URL(string: JANetworkingConfiguration.baseURL + "/auth/user/")!
-        let params:[String:Any?] = ["first_name": nil, "last_name": nil, "middle_initial": nil, "username": nil, "phone_number": newNumber]
-        return JANetworkingResource(method: .PUT, url: url, headers: nil, params: params, parseJSON: { json in
             guard let userDictionary = json as? JSONDictionary else { return nil }
-            return nil
+            // Parse and save server info here! If using core data, pass in the ManagedObjectContext and save the data in this block.
+            return User(json: userDictionary)
         })
     }
     
@@ -57,8 +51,34 @@ public final class User:NSObject {
         let url = URL(string: JANetworkingConfiguration.baseURL + "/auth/user/")!
         return JANetworkingResource(method: .GET, url: url, headers: nil, params: nil, parseJSON: { json in
             guard let dictionary = json as? JSONDictionary else { return nil }
-            return nil
+            return User(json: dictionary)
         })
+    }
+    
+    // Update user data
+    static func update(username:String, phone:Int) -> JANetworkingResource<User>{
+        let url = URL(string: JANetworkingConfiguration.baseURL + "/auth/user/")!
+        let params:JSONDictionary = ["username":username, "phone_number":phone]
+        return JANetworkingResource(method: .POST, url: url, headers: nil, params: params, parseJSON: { json in
+            guard let dictionary = json as? JSONDictionary else { return nil }
+            return User(json: dictionary)
+        })
+    }
+
+}
+
+extension User {
+    
+    // Define this function in an extension to not override the default initializer
+    init?(json:JSONDictionary) {
+        guard let username = json["username"] as? String,
+            let id = json["id"] as? String,
+            let phone = json["phone_number"] as? Int else {
+                return nil
+        }
+        self.username = username
+        self.id = id
+        self.phoneNumber = phone
     }
 
 }

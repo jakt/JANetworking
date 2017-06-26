@@ -6,24 +6,56 @@
 //  Copyright © 2016 JAKT. All rights reserved.
 //
 
-public protocol JANetworkDelegate: class {
+@objc public protocol JANetworkDelegate: class {
+    /// Function that will be called anytime a server call is made with an expired or bad token. This method must refresh the token so that it will be valid next time JANetworking calls retries the server call.
     func updateToken(completion: @escaping ((Bool)->Void))
+    /// Function that will be called when updateToken fails to fix the token issue.
     func unauthorizedCallAttempted()
+    /// Function that will be called when the token status changes
+    @objc optional func tokenStatusChanged()
 }
+
 
 import Foundation
 
+public enum TokenStatus {
+    case invalidRefreshedSuccessfully
+    case invalidCantRefresh
+    case valid
+}
+
 public final class JANetworking {
-    // Load json request
     
     private static let noMorePagesIdentifier = "No more pages"
-    
     weak public static var delegate:JANetworkDelegate?
     
+    public static var tokenStatus:TokenStatus? {
+        didSet {
+            if tokenStatus != oldValue {
+               delegate?.tokenStatusChanged?()
+            }
+        }
+    }
+    
+    // Var where all paginated urls are stored
+    private static var nextPageUrl:[String:String] = [:]
+    private static var currentTasks:[NSURLRequest:URLSessionTask] = [:] {
+        didSet {
+            let tasksOngoing = currentTasks.count > 0
+            UIApplication.shared.isNetworkActivityIndicatorVisible = tasksOngoing  // Show network indicator if any tasks are still happening
+        }
+    }
+    
+    // MARK: - Public JSON Requests
+    
+    /// Loads a JANetworkingResource from the server and returns the results
     public static func loadJSON<A>(resource: JANetworkingResource<A>, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
         createServerCall(resource: resource, useNextPage:false, retryCount:0, completion: completion)
     }
     
+    /// Loads a JANetworkingResource from the server and returns the next page. The next time this function is called on the same resource, the page index will move up. This will continue until there are no more pages to load at which point an error will be returned.
+    /// Page limit is the page count above which the function stops returning values
+    /// Paged URL's need to be in the format of "<main URL>&page=8"
     public static func loadPagedJSON<A>(resource: JANetworkingResource<A>, pageLimit:Int? = nil, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
         if !isNextPageAvailable(for: resource, pageLimit: pageLimit) {
             let err = JAError(field: "Paging error", message: "Last page reached, no new pages available")
@@ -34,35 +66,42 @@ public final class JANetworking {
         createServerCall(resource: resource, useNextPage:true, retryCount:0, completion: completion)
     }
     
+    /// Returns a boolean signifying whether or not the resource being handed in has any more pages to load. Will always return true for the first page a resource even if the resource isn't paginated.
+    /// Paged URL's need to be in the format of "<main URL>&page=8"
     public static func isNextPageAvailable<A>(for resource:JANetworkingResource<A>, pageLimit:Int? = nil) -> Bool {
-        if let next = nextPageUrl[resource.id] {
-            if next != noMorePagesIdentifier {
-                if let pageLimit = pageLimit {
-                    let andComponents = next.components(separatedBy: "&")
-                    var pageInt:Int?
-                    for component in andComponents {
-                        if component.contains("page=") {
-                            let pageComponents = component.components(separatedBy: "page=")
-                            if let nextPageString = pageComponents.last, let nextPageCount = Int(nextPageString) {
-                                pageInt = nextPageCount
-                                break
-                            }
-                        }
-                    }
-                    if let nextPageCount = pageInt, nextPageCount > pageLimit {
-                        return false  // valid next page but pre-defined page limit reached already
+        
+        guard let next = nextPageUrl[resource.id] else { return true } // If false, this is the first call being made on this resource.
+        
+        guard next != noMorePagesIdentifier else { return false } // If false, the last page has already been hit
+        
+        if let pageLimit = pageLimit { // If false, this resource is not page limited and next page url is valid
+            
+            // Find the page number within the URL string
+            let andComponents = next.components(separatedBy: "&")
+            var pageInt:Int?
+            for component in andComponents {
+                if component.contains("page=") {
+                    let pageComponents = component.components(separatedBy: "page=")
+                    if let nextPageString = pageComponents.last, let nextPageCount = Int(nextPageString) {
+                        pageInt = nextPageCount
+                        break
                     }
                 }
-                return true // Not page limit and next page url is valid
             }
-            return false // last page has been hit
+            if let nextPageCount = pageInt, nextPageCount > pageLimit {
+                return false  // There is a valid next page but the pre-defined page limit has been reached
+            }
         }
-        return true // No inital call has been made on resource
+        return true  // Either there's no page limit or the "next" url is under the page limit
     }
     
+    
+    // MARK: - Private functions
+    
+    /// Main function within JANetworking. Fetches data from the server and returns it in a completion block
     private static func createServerCall<A>(resource: JANetworkingResource<A>, useNextPage:Bool, retryCount:Int, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
-        UIApplication.shared.isNetworkActivityIndicatorVisible = true
-        // Check if theres a valid nextPage url
+        
+        // Check if theres a valid nextPage url (only if useNextPage is TRUE)
         var nextUrl:URL?
         if useNextPage {
             if let next = nextPageUrl[resource.id] {
@@ -81,20 +120,20 @@ public final class JANetworking {
             }
         }
 
-        // Create request
+        // Create the request object
         let request = NSMutableURLRequest(url: resource.url)
-        // Setup params if next page isn't valid
+        
+        // Setup the full url string
         if let nextUrl = nextUrl {
-            request.url = nextUrl
+            request.url = nextUrl  // If a valid paginated url exists, use it directly
         } else if let params = resource.params {
+            // Setup params if needed but only if next page isn't valid
             if resource.method == .GET {
-                var stringParams:[String:String]
+                var stringParams:[String:String] = [:]
                 if let sParams = params as? [String:String] {
                     stringParams = sParams
                 } else if let sParams = convertToStringDictionary(dictionary: params) {
                     stringParams = sParams
-                } else {
-                    stringParams = [:]
                 }
                 let query = buildQueryString(fromDictionary: stringParams)
                 let baseURL = request.url!.absoluteString
@@ -108,13 +147,11 @@ public final class JANetworking {
         }
         request.httpMethod = resource.method.rawValue
         
-        // Setup headers
-        
         // Add default headers
         for (key, value) in JANetworkingConfiguration.sharedConfiguration.configurationHeaders {
             request.addValue(value, forHTTPHeaderField: key)
         }
-        
+        // Add any additional custom headers for this resource
         if let headers = resource.headers {
             for (key, value) in headers {
                 request.addValue(value, forHTTPHeaderField: key)
@@ -126,77 +163,102 @@ public final class JANetworking {
             request.addValue("JWT \(token)", forHTTPHeaderField: "Authorization")
         }
         
-        URLSession.shared.dataTask(with: request as URLRequest) { (data:Data?, response:URLResponse?, error:Error?) in
-            UIApplication.shared.isNetworkActivityIndicatorVisible = false
-            // error is nil when request fails. Not nil when the request passes. However even if the request went through, the reponse can be of status code error 400 up or 500 up
-            if let errorObj = error {
-                DispatchQueue.main.async(execute: {
+        // Begin the actual server call
+        let task = URLSession.shared.dataTask(with: request as URLRequest) { (data:Data?, response:URLResponse?, error:Error?) in
+            // Remove the task from the running list
+            currentTasks.removeValue(forKey: request)
+            
+            // error is nil when request passes, not nil when the request fails. However even if the request returns NO error, the reponse can be of status code error 400 up or 500 up
+            DispatchQueue.main.async(execute: {
+                if let errorObj = error {
                     let networkError = JANetworkingError(error: errorObj)
-                    var tokenInvalid = networkError.statusCode == 401
-                    if let errorData = networkError.errorData, let errorObj = errorData.first, let msg = errorObj.message, (msg.contains("token") || msg.contains("expired")) {
-                        tokenInvalid = true
-                    }
-                    if tokenInvalid {
-                        if retryCount <= JANetworkingConfiguration.unauthorizedRetryLimit, let delegate = delegate {
-                            delegate.updateToken(completion: {(success:Bool) in
-                                if success {
-                                    let count = retryCount + 1
-                                    createServerCall(resource: resource, useNextPage:useNextPage, retryCount: count, completion: completion)
-                                } else {
-                                    self.delegate?.unauthorizedCallAttempted()
-                                    completion(nil, networkError)
-                                }
-                            })
-                        } else {
-                            delegate?.unauthorizedCallAttempted()
+                    evaluateError(networkError: networkError, retryCount: retryCount, completion: { (tokenStatus) in
+                        switch tokenStatus {
+                        case .invalidRefreshedSuccessfully:
+                            // Retry the same server call now that the token as been updated.
+                            self.tokenStatus = tokenStatus
+                            let count = retryCount + 1
+                            createServerCall(resource: resource, useNextPage:useNextPage, retryCount: count, completion: completion)
+                        case .invalidCantRefresh:
+                            // The server call failed because of token issues but was unable to resolve itself.
+                            self.tokenStatus = tokenStatus
                             completion(nil, networkError)
+                        case .valid:
+                            // This error is NOT token related. Return the error as normal.
+                            completion(nil, networkError)
+                            // Token status is NOT being updated here because the an error occurred during the server call which means the token may not have even been validated yet.
                         }
-                    } else {
-                        completion(nil, networkError)
-                    }
-                })
-            }else{
-                DispatchQueue.main.async(execute: {
-                    // Success request, HOWEVER the reponse can be with status code 400 and up (Errors)
-                    // Ensure that there is no error in the reponse and in the server
-                    let networkError = JANetworkingError(responseError: response, serverError: JANetworkingError.parseServerError(data: data))
+                    })
+                }else{
+                    // Successful request, HOWEVER the reponse can have an error with status code 400 and up (Errors)
                     var results = data.flatMap(resource.parse)
-                    if results == nil {
-                        let responseObj = response as? HTTPURLResponse
-                        let successData = ["StatusCode":responseObj?.statusCode] as JSONDictionary
+                    if results == nil, let responseObj = response as? HTTPURLResponse {
+                        let successData = ["StatusCode":responseObj.statusCode] as JSONDictionary
                         results = resource.parseJson(successData)
                     }
-                    var tokenInvalid = networkError?.statusCode == 401
-                    if let errorData = networkError?.errorData, let errorObj = errorData.first, let msg = errorObj.message, (msg.contains("token") || msg.contains("expired")) {
-                        tokenInvalid = true
-                    }
-                    if tokenInvalid {
-                        if retryCount < JANetworkingConfiguration.unauthorizedRetryLimit, let delegate = delegate {
-                            delegate.updateToken(completion: {(success:Bool) in
-                                if success {
-                                    let count = retryCount + 1
-                                    createServerCall(resource: resource, useNextPage:useNextPage, retryCount: count, completion: completion)
-                                } else {
-                                    self.delegate?.unauthorizedCallAttempted()
-                                    completion(results, networkError)
-                                }
-                            })
-                        } else {
-                            delegate?.unauthorizedCallAttempted()
+                    
+                    // Ensure that there is no error in the reponse and in the server
+                    let networkError = JANetworkingError(responseError: response, serverError: JANetworkingError.parseServerError(data: data))
+                    evaluateError(networkError: networkError, retryCount: retryCount, completion: { (tokenStatus) in
+                        switch tokenStatus {
+                        case .invalidRefreshedSuccessfully:
+                            // Retry the same server call now that the token as been updated.
+                            self.tokenStatus = tokenStatus
+                            let count = retryCount + 1
+                            createServerCall(resource: resource, useNextPage:useNextPage, retryCount: count, completion: completion)
+                        case .invalidCantRefresh:
+                            // The server call failed because of token issues but was unable to resolve itself.
+                            self.tokenStatus = tokenStatus
+                            completion(results, networkError)
+                        case .valid:
+                            // Server call was successful and token is valid. There still may be a valid non-token related error being returned here. This is where all successful server calls return data. For paginated server calls, save the next page URL if it's returned.
+                            if networkError == nil {
+                                // Token status is only updated if there is NO error. If there is an error, the token may not be validated yet.
+                                self.tokenStatus = tokenStatus
+                            }
+                            saveNextPage(for: resource, data: data)
                             completion(results, networkError)
                         }
+                    })
+                }
+            })
+        }
+        task.resume()
+        // Add the task to the list of all current server calls
+        JANetworking.currentTasks[request] = task
+    }
+
+    /// Evaluates whether or not the token is valid. If invalid, it tries to refresh it.
+    private static func evaluateError(networkError: JANetworkingError?, retryCount:Int, completion:@escaping ((TokenStatus)->Void)) {
+        guard let networkError = networkError else {
+            completion(.valid)
+            return
+        }
+        
+        if networkError.errorType == .invalidToken {
+            // TOKEN IS INVALID. Try to refresh the token and try again. If that fails, call the unauthorizedCallAttempted callback to alert the app.
+            if retryCount <= JANetworkingConfiguration.sharedConfiguration.unauthorizedRetryLimit, let delegate = delegate {
+                delegate.updateToken(completion: {(success:Bool) in
+                    if success {
+                        // Retry the same server call now that the token as been updated.
+                        completion(.invalidRefreshedSuccessfully)
                     } else {
-                        // Valid token, return error and data
-                        saveNextPage(for: resource, data: data)
-                        completion(results, networkError)
+                        self.delegate?.unauthorizedCallAttempted()
+                        completion(.invalidCantRefresh)
                     }
                 })
+            } else {
+                // The server call failed because of token issues but was unable to resolve itself.
+                delegate?.unauthorizedCallAttempted()
+                completion(.invalidCantRefresh)
             }
-            
-        }.resume()
+        } else {
+            // This error is NOT token related. Return the error as normal.
+            completion(.valid)
+        }
     }
     
-    private static var nextPageUrl:[String:String] = [:]
+    /// Will take the server response and parse out if a "next page" URL is returned with it. If so, the "next" URL is saved to be used next time the resource is handed into the loadPagedJSON function
     private static func saveNextPage<A>(for resource:JANetworkingResource<A>, data:Data?) {
         guard let data = data else {return}
         let json = try? JSONSerialization.jsonObject(with: data, options: [])
@@ -209,17 +271,17 @@ public final class JANetworking {
         }
     }
     
-    private static func convertToStringDictionary(dictionary:[String:Any]) -> [String:String]? {
+    private static func convertToStringDictionary(dictionary:JSONDictionary) -> [String:String]? {
         var newDictionary:[String:String] = [:]
         for (key, value) in dictionary {
             if let value = value as? String {
                 newDictionary[key] = value
-            }else if let value = value as? [String:String] {
+            } else if let value = value as? [String:String] {
                 do {
                     let jsonData = try JSONSerialization.data(withJSONObject: value, options: JSONSerialization.WritingOptions())
-                    let convertedString = String(data: jsonData, encoding: String.Encoding.utf8) // the data will be converted to the string
-//                    let stringWithoutQuotes = convertedString?.replacingOccurrences(of: "\"", with: "")
-                    newDictionary[key] = "'\(convertedString)'"
+                    if let convertedString = String(data: jsonData, encoding: String.Encoding.utf8) { // the data will be converted to a string
+                        newDictionary[key] = "'\(convertedString)'"
+                    }
                 } catch {
                     print("params conversion to string failed")
                     return nil
@@ -227,9 +289,9 @@ public final class JANetworking {
             } else if let value = value as? [String] {
                 do {
                     let jsonData = try JSONSerialization.data(withJSONObject: value, options: JSONSerialization.WritingOptions())
-                    let convertedString = String(data: jsonData, encoding: String.Encoding.utf8) // the data will be converted to the string
-//                    let stringWithoutQuotes = convertedString?.replacingOccurrences(of: "\"", with: "")
-                    newDictionary[key] = "'\(convertedString)'"
+                    if let convertedString = String(data: jsonData, encoding: String.Encoding.utf8) { // the data will be converted to a string
+                        newDictionary[key] = "'\(convertedString)'"
+                    }
                 } catch {
                     print("params conversion to string failed")
                     return nil

@@ -29,41 +29,45 @@ public enum ErrorType {
     case gatewayTimeout
     
     init(response: HTTPURLResponse, error: JAError?) {
-        // Check what kind of error type based on response
-        switch response.statusCode {
-            
-        // Response Error
-        case 400:
-            if error?.field == "token" && error?.message == "Signature has expired." { // Check for invalid token
-                self = .invalidToken
-            }else {
+        // Check if token is invalid based on configuration settings
+        var tokenInvalid:Bool = false
+        JANetworkingConfiguration.sharedConfiguration.invalidTokenHTTPStatusCodes.forEach({ (code) in
+            let invalid = response.statusCode == code
+            tokenInvalid = tokenInvalid || invalid
+        })
+        if let errorMsg = error?.message {
+            JANetworkingConfiguration.sharedConfiguration.invalidTokenServerResponseText.forEach({ (text) in
+                tokenInvalid = tokenInvalid || errorMsg.contains(text)
+            })
+        }
+        
+        if tokenInvalid {
+            self = .invalidToken
+        } else {
+            // Check what kind of error type based on response
+            switch response.statusCode {
+                
+            // Response Error
+            case 400:
                 self = .badRequest
+            case 401:
+                self = .unauthorized
+            case 404:
+                self = .notFound
+            case 405:
+                self = .methodNotAllowed
+            case 500:
+                self = .internalServerError
+            case 502:
+                self = .badGateway
+            case 503:
+                self = .serviceUnavailable
+            case 504:
+                self = .gatewayTimeout
+                
+            default:
+                self = .unknown
             }
-            break
-        case 401:
-            self = .unauthorized
-            break
-        case 404:
-            self = .notFound
-            break
-        case 405:
-            self = .methodNotAllowed
-            break
-        case 500:
-            self = .internalServerError
-            break
-        case 502:
-            self = .badGateway
-            break
-        case 503:
-            self = .serviceUnavailable
-            break
-        case 504:
-            self = .gatewayTimeout
-            break
-            
-        default:
-            self = .unknown
         }
     }
     
@@ -100,25 +104,25 @@ public enum ErrorType {
 }
 
 public struct JAError {
-    public var field: String? = nil
-    public var message: String? = nil
+    public var field: String?
+    public var message: String?
 }
 
 public struct JANetworkingError {
     public let errorType: ErrorType
-    public var statusCode: Int? = nil
-    public var errorData: [JAError]? = nil
+    public var statusCode: Int?
+    public var errorData: [JAError]?
 }
 
 extension JANetworkingError {
-    // Error init. An Error object exist
+    /// Error init. An Error object exist
     public init(error: Error) {
         self.errorType = .nsurlError
         let errorObject = JAError(field: nil, message: error.localizedDescription)
         self.errorData = [errorObject]
     }
     
-    // Optional. Based on the response, it can still be an error depending on the status code
+    /// Optional. Based on the response, it can still be an error depending on the status code
     public init?(responseError: URLResponse?, serverError: [JAError]?) {
         // Make sure reponse exist and the status code is between the 2xx range
         guard let response = responseError as? HTTPURLResponse , !(response.statusCode >= 200 && response.statusCode < 300) else {
@@ -129,8 +133,8 @@ extension JANetworkingError {
         self.errorData = serverError
     }
     
-    // Parse the sever error ensuring that the server has an error or not
-    public static func parseServerError(data: Data?) -> [JAError]?{
+    /// Parse the server data to find and compile list of all errors (if any)
+    public static func parseServerError(data: Data?) -> [JAError]? {
         if let data = data {
             let json = try? JSONSerialization.jsonObject(with: data, options: [])
             guard let results = json as? JSONDictionary else { return nil }
