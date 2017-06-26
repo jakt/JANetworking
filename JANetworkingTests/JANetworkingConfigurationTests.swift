@@ -49,26 +49,21 @@ class JANetworkingConfigurationTests: XCTestCase {
         XCTAssertEqual("3", JANetworkingConfiguration.sharedConfiguration.configurationHeaders["three"])
     }
  
+    var start:Date?
+    var resetStart:Date?
+    var asyncExpectation: XCTestExpectation?
     func testTimer () {
-        let asyncExpectation = expectation(description: "async")
+        asyncExpectation = expectation(description: "delegate exception")
 
-        let start = Date()
-        var resetStart = Date()
-        JANetworkingConfiguration.setUpRefreshTimer(timeInterval: 5.0) {
-            let interval = -start.timeIntervalSinceNow
-            let resetInterval = -resetStart.timeIntervalSinceNow
-            XCTAssertLessThan(interval, 8.1)
-            XCTAssertGreaterThan(interval, 7.9)
-            XCTAssertLessThan(resetInterval, 5.1)
-            XCTAssertGreaterThan(resetInterval, 4.9)
-            
-            asyncExpectation.fulfill()
-        }
+        start = Date()
+        resetStart = Date()
+        JANetworkingConfiguration.setUpRefreshTimer(timeInterval: 5.0)
+        JANetworking.delegate = self
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: {
             // Resets the timer after 3 seconds. This will cause the refresh timer block to be delay for another 3 seconds before triggering.
             JANetworkingConfiguration.resetRefreshTimer()
-            resetStart = Date()
+            self.resetStart = Date()
         })
         
         waitForExpectations(timeout: 60) { error in
@@ -76,5 +71,23 @@ class JANetworkingConfigurationTests: XCTestCase {
                 print("Error: \(error.localizedDescription)")
             }
         }
+    }
+}
+
+extension JANetworkingConfigurationTests:JANetworkDelegate {
+    func updateToken(completion: @escaping ((Bool)->Void)) {
+        guard let start = start, let resetStart = resetStart else { return }
+        let interval = -start.timeIntervalSinceNow
+        let resetInterval = -resetStart.timeIntervalSinceNow
+        XCTAssertLessThan(interval, 8.1)
+        XCTAssertGreaterThan(interval, 7.9)
+        XCTAssertLessThan(resetInterval, 5.1)
+        XCTAssertGreaterThan(resetInterval, 4.9)
+        
+        asyncExpectation?.fulfill()
+    }
+    
+    func unauthorizedCallAttempted() {
+        print("unauth")
     }
 }
