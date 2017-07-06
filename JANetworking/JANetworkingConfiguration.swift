@@ -120,10 +120,6 @@ public final class JANetworkingConfiguration {
         sharedConfiguration.unauthorizedRetryLimit = limit
     }
     
-    // MARK: - Images
-    
-    public static var automaticallySaveImageToDisk = true
-    
     
     // MARK: - Refresh Timer Code
     
