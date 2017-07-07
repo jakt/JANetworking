@@ -4,8 +4,7 @@
 [![Language: Swift 3](https://img.shields.io/badge/language-swift%203-4BC51D.svg?style=flat)](https://developer.apple.com/swift)
 ![License: MIT](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)
 
-JANetworking is the JAKT internal networking library for Swift iOS projects.
-
+JANetworking is a networking library that handles both secure token management and clean server response parsing. Simple API calls can be completely set up, parsed, and returned within the code of an object itself, or an adapter. On every server call, the token is updated, saved, and used only once on the very next call, creating a secure connection to the server. With little setup, this library can fully track and refresh that token without you needing to track it yourself.
 
 ## Installation
 JANetworking is designed to be installed using Carthage.
@@ -36,10 +35,9 @@ Run `carthage` to build the framework and drag the built `JANetworking.framework
 ---
 
 ## Usage
-Much of the JANetworking integration will be in the object's own code.  
-For our example we'll use a model type called `Post`.
+Much of the JANetworking integration will be in the code of the objects themselves.  
+Let's take a look at how to use JANetworking with a simple object `Post`:
 
-### Models
 ```
 struct Post {
     let id: Int
@@ -48,24 +46,8 @@ struct Post {
     let authorId: String
 }
 ```
-Extend this struct model to add an init method so that the default init wont be overridden:
-```
-extension Post {
-    init?(dictionary: [String: Any?]){
-        guard let id = dictionary["id"] as? Int,
-            let title = dictionary["title"] as? String,
-            let body = dictionary["body"] as? String,
-            let authorId = dictionary["author_id"] as? String else { return nil }
-        
-        self.id = id
-        self.title = title
-        self.body = body
-        self.authorId = authorId
-    }
-}
-```
 
-We can now add all server calls to the `Post` object. For our example, we've created 2 endpoints:  
+With this library we can simply configure all server calls in the `Post` object. For our example, we've created 2 endpoints:  
 - `Post.all`: Fetches all the post objects from the server. This function is `static` so that it can be use without instantiating the object.   
 - `Post.submit`: Creates a post object on the server. This does not need to be `static` because it requires the object itself to pull the required info.
 ```
@@ -81,7 +63,7 @@ We can now add all server calls to the `Post` object. For our example, we've cre
         })
     }
     
-    // Submit a post
+    /// Submit a post
     public func submit() -> JANetworkingResource<Post>{
         let url = URL(string: JANetworkingConfiguration.baseURL + "/posts")!
         let params:JSONDictionary = ["id": id,
@@ -95,10 +77,9 @@ We can now add all server calls to the `Post` object. For our example, we've cre
     }
 ```
 All methods must return a resource generic object type.
-### JANetworking
-`JANetworking.loadJSON` takes in a resource generic type and a completion block. Using `JANetworking.loadJSON` will automatically detect the **[JANetworkingError](/JANetworking/JANetworkingError.swift)**  from our stack.
+### Making Server Calls
+Use `JANetworking.loadJSON` to actually make your server calls. This function takes in a resource generic type and a completion block and returns you the object type defined in your resource.
 
-Finally on your `ViewController`. You can call:  
 #### Get All Posts
 ```
 JANetworking.loadJSON(Post.all()) { data, error in
@@ -112,7 +93,7 @@ JANetworking.loadJSON(Post.all()) { data, error in
 #### Create a Post
 ```
 let post = Post(id: 100, title: "My Title", body: "Some Message Here.", authorId:"199")
-JANetworking.loadJSON(post.submit(headers)) { data, error in
+JANetworking.loadJSON(post.submit()) { data, error in
     if let err = error {
         print("`PPost.submit` - NETWORK ERROR: \(err.errorType.errorTitle())")
     } else if let data = data {
@@ -129,17 +110,17 @@ There are a few settings that should be configured on app launch that will be th
 #### Required
 - `setBaseURL(development:String, staging:String, production:String)` - Set the URLs for all environments
 - `set(environment:NetworkEnvironment)` - Set the current environment
-- `setSaveToken(block:SaveTokenBlock)` - Customize how the token is saved
-- `setLoadToken(block:LoadTokenBlock)` - Customize how the token is loaded
+- `setSaveToken(block:SaveTokenBlock)` - Customize how the token is saved. Usually this is a simple keychain store one liner.
+- `setLoadToken(block:LoadTokenBlock)` - Customize how the token is loaded. Usually this is a simple keychain fetch.
 
 #### Optional
-- `set(header:String, value:String?)` - Set the request headers for network requests
+- `set(header:String, value:String?)` - Set the default request headers for all network requests
 - `setInvalidTokenInfo(serverResponseText:[String], HTTPStatusCodes:[Int])` - Set the triggers for an invalid token. If any server call matches any of the info passed in here, it will trigger a token refresh.
-- `setUnauthorizedRetryLimit(_ limit:Int)` - Set the number of times the token should attempt to refresh before the server call fails.
-- `setUpRefreshTimer(timeInterval:TimeInterval)` - Set the refresh interval for the token
+- `setUnauthorizedRetryLimit(_ limit:Int)` - Set the number of times the token should attempt to refresh before the server is counted as unsuccesful.
+- `setUpRefreshTimer(timeInterval:TimeInterval)` - Set the refresh interval for the token.
 
 ### JANetworkingError
-If any issues arise during a server call, a `JANetworkingError` object will be created. This object includes the status code, an easily readable `errorType`, and more detailed `errorData`. Example:
+If `JANetworking.loadJSON` automatically detects any errors, a **[JANetworkingError](/JANetworking/JANetworkingError.swift)** object will be created. This object includes the status code, an easily readable `errorType`, and more detailed `errorData`. Example:
 ```
 if let err:JANetworkingError = error {
     print("NETWORK ERROR: \(err.errorType.errorTitle())")
