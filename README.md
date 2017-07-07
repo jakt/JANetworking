@@ -36,6 +36,7 @@ Run `carthage` to build the framework and drag the built `JANetworking.framework
 
 ## Usage
 Much of the JANetworking integration will be in the code of the objects themselves.  
+
 Let's take a look at how to use JANetworking with a simple object `Post`:
 
 ```
@@ -108,13 +109,13 @@ Before using JANetworking, you must first configure the library to work with you
 There are a few settings that should be configured on app launch that will be the default settings for all server calls. Below is a list of everything that can be set:
 
 #### Required
-- `setBaseURL(development:String, staging:String, production:String)` - Set the URLs for all environments
-- `set(environment:NetworkEnvironment)` - Set the current environment
+- `setBaseURL(development:String, staging:String, production:String)` - Set the URLs for all environments.
+- `set(environment:NetworkEnvironment)` - Set the current environment.
 - `setSaveToken(block:SaveTokenBlock)` - Customize how the token is saved. Usually this is a simple keychain store one liner.
 - `setLoadToken(block:LoadTokenBlock)` - Customize how the token is loaded. Usually this is a simple keychain fetch.
 
 #### Optional
-- `set(header:String, value:String?)` - Set the default request headers for all network requests
+- `set(header:String, value:String?)` - Set the default request headers for all network requests.
 - `setInvalidTokenInfo(serverResponseText:[String], HTTPStatusCodes:[Int])` - Set the triggers for an invalid token. If any server call matches any of the info passed in here, it will trigger a token refresh.
 - `setUnauthorizedRetryLimit(_ limit:Int)` - Set the number of times the token should attempt to refresh before the server is counted as unsuccesful.
 - `setUpRefreshTimer(timeInterval:TimeInterval)` - Set the refresh interval for the token.
@@ -130,6 +131,7 @@ if let err:JANetworkingError = error {
 }
 ```
 Errors that can trigger the creation of a valid JANetworkingError object include an `NSError` and response errors parsed from either the `URLResponse` or the response `Data` object itself.
+
 #### NSError
 - This error occurs when `dataTaskWithRequest` returns an NSError, which is unrelated to the reponse error. This means that the request has failed.
 
