@@ -8,7 +8,7 @@ JANetworking is the JAKT internal networking library for Swift iOS projects.
 
 
 ## Installation
-JANetworking is designed to be installed using Carthage
+JANetworking is designed to be installed using Carthage.
 
 [Carthage](https://github.com/Carthage/Carthage) is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks.
 
@@ -37,7 +37,7 @@ Run `carthage` to build the framework and drag the built `JANetworking.framework
 
 ## Usage
 Much of the JANetworking integration will be in the object's own code.  
-For our example we'll use a model type called `Post`
+For our example we'll use a model type called `Post`.
 
 ### Models
 ```
@@ -48,7 +48,7 @@ struct Post {
     let authorId: String
 }
 ```
-Extend this struct model to add an init method so that the default init wont be overridden
+Extend this struct model to add an init method so that the default init wont be overridden:
 ```
 extension Post {
     init?(dictionary: [String: Any?]){
@@ -66,8 +66,8 @@ extension Post {
 ```
 
 We can now add all server calls to the `Post` object. For our example, we've created 2 endpoints:  
-`Post.all`: Fetches all the post objects from the server. This function is `static` so that it can be use without instantiating the object.   
-`Post.submit`: Creates a post object on the server. This does not need to be `static` because it requires the object itself to pull the required info.
+- `Post.all`: Fetches all the post objects from the server. This function is `static` so that it can be use without instantiating the object.   
+- `Post.submit`: Creates a post object on the server. This does not need to be `static` because it requires the object itself to pull the required info.
 ```
     ....
     
@@ -96,7 +96,7 @@ We can now add all server calls to the `Post` object. For our example, we've cre
 ```
 All methods must return a resource generic object type.
 ### JANetworking
-`JANetworking.loadJSON` takes in a resource generic type and a completion block. Using `JANetworking.loadJSON` will automatically detect the **[JANetworkingError](/JANetworking/JANetworkingError.swift)**  from our stack
+`JANetworking.loadJSON` takes in a resource generic type and a completion block. Using `JANetworking.loadJSON` will automatically detect the **[JANetworkingError](/JANetworking/JANetworkingError.swift)**  from our stack.
 
 Finally on your `ViewController`. You can call:  
 #### Get All Posts
@@ -122,7 +122,8 @@ JANetworking.loadJSON(post.submit(headers)) { data, error in
 ```
 
 ### JANetworkingConfiguration
-Before using JANetworking you must first configure the library to work with your specific server. This configuration is done using the `JANetworkConfiguration` object.
+Before using JANetworking, you must first configure the library to work with your specific server. This configuration is done using the `JANetworkConfiguration` object.
+
 There are a few settings that should be configured on app launch that will be the default settings for all server calls. Below is a list of everything that can be set:
 
 #### Required
@@ -138,7 +139,7 @@ There are a few settings that should be configured on app launch that will be th
 - `setUpRefreshTimer(timeInterval:TimeInterval)` - Set the refresh interval for the token
 
 ### JANetworkingError
-If any issues arise during a server call a `JANetworkingError` object will be created. This object includes the status code, an easily readable `errorType`, and more detailed `errorData`. Example:
+If any issues arise during a server call, a `JANetworkingError` object will be created. This object includes the status code, an easily readable `errorType`, and more detailed `errorData`. Example:
 ```
 if let err:JANetworkingError = error {
     print("NETWORK ERROR: \(err.errorType.errorTitle())")
@@ -152,10 +153,10 @@ Errors that can trigger the creation of a valid JANetworkingError object include
 - This error occurs when `dataTaskWithRequest` returns an NSError, which is unrelated to the reponse error. This means that the request has failed.
 
 #### Reponse Error
- - This occurs when the `dataTaskWithRequest` returns successfully, however the reponse is within the range of status code ERROR (4xx or 5xx)
+ - This occurs when the `dataTaskWithRequest` returns successfully, however the reponse is within the range of status code ERROR (4xx or 5xx).
  - This can also occur when the server call is successful but the JSON packet received includes an `error` key that has valid information that can be parsed.
 
 #### JAError
-JAError contains properties `JAError.field` and `JAError.message`  
+JAError contains properties `JAError.field` and `JAError.message`.  
 You can access this information through the JANetworkingError property `err.errorData` which returns an Array of JAError objects. 
  
