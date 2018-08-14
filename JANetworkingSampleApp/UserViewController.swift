@@ -29,7 +29,7 @@ class UserViewController: UIViewController {
         NotificationCenter.default.removeObserver(self, name: tokenStatusNotificationName, object: nil)
     }
     
-    func tokenStatusChanged() {
+    @objc func tokenStatusChanged() {
         switch JANetworking.tokenStatus {
         case .invalidCantRefresh?:
             tokenLabel.text = "Token is invalid and cannot be refreshed"
