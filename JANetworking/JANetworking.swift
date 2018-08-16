@@ -42,7 +42,10 @@ public final class JANetworking {
     private static var currentTasks:[NSURLRequest:URLSessionTask] = [:] {
         didSet {
             let tasksOngoing = currentTasks.count > 0
-            UIApplication.shared.isNetworkActivityIndicatorVisible = tasksOngoing  // Show network indicator if any tasks are still happening
+            DispatchQueue.main.async {
+                // Run on main thread since this can update UI
+                UIApplication.shared.isNetworkActivityIndicatorVisible = tasksOngoing  // Show network indicator if any tasks are still happening
+            }
         }
     }
     
