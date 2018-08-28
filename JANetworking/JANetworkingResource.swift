@@ -12,6 +12,7 @@ public typealias JSONDictionary = [String: Any?]
 
 public enum RequestMethod: String {
     case POST = "POST"
+    case PATCH = "PATCH"
     case GET = "GET"
     case PUT = "PUT"
     case DELETE = "DELETE"
