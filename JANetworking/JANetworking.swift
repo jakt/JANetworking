@@ -56,6 +56,12 @@ public final class JANetworking {
         createServerCall(resource: resource, useNextPage:false, retryCount:0, completion: completion)
     }
     
+    /// Loads a JANetworkingResource from the server and returns the results
+    /// This is specifically used to try logging in. The difference between this and the normal loadJSON is these resources are only tried once and never retried
+    public static func loadLoginJSON<A>(resource: JANetworkingResource<A>, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
+        createServerCall(resource: resource, useNextPage:false, retryCount:Int.max, completion: completion)
+    }
+    
     /// Loads a JANetworkingResource from the server and returns the next page. The next time this function is called on the same resource, the page index will move up. This will continue until there are no more pages to load at which point an error will be returned.
     /// Page limit is the page count above which the function stops returning values
     /// Paged URL's need to be in the format of "<main URL>&page=8"
