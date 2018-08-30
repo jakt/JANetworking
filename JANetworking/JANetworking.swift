@@ -104,6 +104,13 @@ public final class JANetworking {
         return true  // Either there's no page limit or the "next" url is under the page limit
     }
     
+    /// Cancels all requests that are current waiting for a response. When cancelled, each request will complete with the error code "Cancelled"
+    public static func cancelAllRequests() {
+        for key in currentTasks.keys {
+            let task = currentTasks[key]
+            task?.cancel()
+        }
+    }
     
     // MARK: - Private functions
     
