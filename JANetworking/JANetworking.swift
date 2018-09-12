@@ -58,8 +58,8 @@ public final class JANetworking {
     
     /// Loads a JANetworkingResource from the server and returns the results
     /// This is specifically used to try refreshing a token or log in. The difference between this and the normal loadJSON is these resources are only tried once and never retried. These also dont NOT include the JWT token.
-    public static func loadLoginJSON<A>(resource: JANetworkingResource<A>, sendToken:Bool, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
-        createServerCall(resource: resource, useNextPage:false, retryCount:Int.max, sendToken: sendToken, isForRefresh:false, completion: completion)
+    public static func loadLoginJSON<A>(resource: JANetworkingResource<A>, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
+        createServerCall(resource: resource, useNextPage:false, retryCount:Int.max, sendToken: false, isForRefresh:false, completion: completion)
     }
     
     /// Loads a JANetworkingResource from the server and returns the results
