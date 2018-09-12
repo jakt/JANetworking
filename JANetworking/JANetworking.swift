@@ -53,14 +53,19 @@ public final class JANetworking {
     
     /// Loads a JANetworkingResource from the server and returns the results
     public static func loadJSON<A>(resource: JANetworkingResource<A>, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
-        createServerCall(resource: resource, useNextPage:false, retryCount:0, sendToken: true, completion: completion)
+        createServerCall(resource: resource, useNextPage:false, retryCount:0, sendToken: true, isForRefresh:false, completion: completion)
     }
     
     /// Loads a JANetworkingResource from the server and returns the results
-    /// This is specifically used to try logging in. The difference between this and the normal loadJSON is these resources are only tried once and never retried. These also dont NOT include the JWT token.
-    public static func loadCustomJSON<A>(resource: JANetworkingResource<A>, retryOnInvalidToken:Bool, sendToken:Bool, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
-        let retryCount = retryOnInvalidToken ? 0 : Int.max
-        createServerCall(resource: resource, useNextPage:false, retryCount:retryCount, sendToken: sendToken, completion: completion)
+    /// This is specifically used to try refreshing a token or log in. The difference between this and the normal loadJSON is these resources are only tried once and never retried. These also dont NOT include the JWT token.
+    public static func loadLoginJSON<A>(resource: JANetworkingResource<A>, sendToken:Bool, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
+        createServerCall(resource: resource, useNextPage:false, retryCount:Int.max, sendToken: sendToken, isForRefresh:false, completion: completion)
+    }
+    
+    /// Loads a JANetworkingResource from the server and returns the results
+    /// This is specifically used to try refreshing a token or log in. The difference between this and the normal loadJSON is these resources are only tried once and never retried. These also dont NOT include the JWT token.
+    public static func loadTokenRefreshJSON<A>(resource: JANetworkingResource<A>, sendToken:Bool, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
+        createServerCall(resource: resource, useNextPage:false, retryCount:Int.max, sendToken: sendToken, isForRefresh:true, completion: completion)
     }
     
     /// Loads a JANetworkingResource from the server and returns the next page. The next time this function is called on the same resource, the page index will move up. This will continue until there are no more pages to load at which point an error will be returned.
@@ -73,7 +78,7 @@ public final class JANetworking {
             completion(nil, error)
             return
         }
-        createServerCall(resource: resource, useNextPage:true, retryCount:0, sendToken: true, completion: completion)
+        createServerCall(resource: resource, useNextPage:true, retryCount:0, sendToken: true, isForRefresh:false, completion: completion)
     }
     
     /// Returns a boolean signifying whether or not the resource being handed in has any more pages to load. Will always return true for the first page a resource even if the resource isn't paginated.
@@ -116,7 +121,7 @@ public final class JANetworking {
     // MARK: - Private functions
     
     /// Main function within JANetworking. Fetches data from the server and returns it in a completion block
-    private static func createServerCall<A>(resource: JANetworkingResource<A>, useNextPage:Bool, retryCount:Int, sendToken:Bool, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
+    private static func createServerCall<A>(resource: JANetworkingResource<A>, useNextPage:Bool, retryCount:Int, sendToken:Bool, isForRefresh:Bool, completion:@escaping (A?, _ err: JANetworkingError?) -> ()){
         
         // Check if theres a valid nextPage url (only if useNextPage is TRUE)
         var nextUrl:URL?
@@ -189,13 +194,13 @@ public final class JANetworking {
             DispatchQueue.main.async(execute: {
                 if let errorObj = error {
                     let networkError = JANetworkingError(error: errorObj)
-                    evaluateError(networkError: networkError, retryCount: retryCount, completion: { (tokenStatus) in
+                    evaluateError(networkError: networkError, retryCount: retryCount, isForRefresh:isForRefresh, completion: { (tokenStatus) in
                         switch tokenStatus {
                         case .invalidRefreshedSuccessfully:
                             // Retry the same server call now that the token as been updated.
                             self.tokenStatus = tokenStatus
                             let count = retryCount + 1
-                            createServerCall(resource: resource, useNextPage:useNextPage, retryCount: count, sendToken: sendToken, completion: completion)
+                            createServerCall(resource: resource, useNextPage:useNextPage, retryCount: count, sendToken: sendToken, isForRefresh:isForRefresh, completion: completion)
                         case .invalidCantRefresh:
                             // The server call failed because of token issues but was unable to resolve itself.
                             self.tokenStatus = tokenStatus
@@ -216,13 +221,13 @@ public final class JANetworking {
                     
                     // Ensure that there is no error in the reponse and in the server
                     let networkError = JANetworkingError(responseError: response, serverError: JANetworkingError.parseServerError(data: data))
-                    evaluateError(networkError: networkError, retryCount: retryCount, completion: { (tokenStatus) in
+                    evaluateError(networkError: networkError, retryCount: retryCount, isForRefresh:isForRefresh, completion: { (tokenStatus) in
                         switch tokenStatus {
                         case .invalidRefreshedSuccessfully:
                             // Retry the same server call now that the token as been updated.
                             self.tokenStatus = tokenStatus
                             let count = retryCount + 1
-                            createServerCall(resource: resource, useNextPage:useNextPage, retryCount: count, sendToken: sendToken, completion: completion)
+                            createServerCall(resource: resource, useNextPage:useNextPage, retryCount: count, sendToken: sendToken, isForRefresh:isForRefresh, completion: completion)
                         case .invalidCantRefresh:
                             // The server call failed because of token issues but was unable to resolve itself.
                             self.tokenStatus = tokenStatus
@@ -246,14 +251,21 @@ public final class JANetworking {
     }
 
     /// Evaluates whether or not the token is valid. If invalid, it tries to refresh it.
-    private static func evaluateError(networkError: JANetworkingError?, retryCount:Int, completion:@escaping ((TokenStatus)->Void)) {
+    private static func evaluateError(networkError: JANetworkingError?, retryCount:Int, isForRefresh:Bool, completion:@escaping ((TokenStatus)->Void)) {
         guard let networkError = networkError else {
             completion(.valid)
             return
         }
         
         if networkError.errorType == .invalidToken {
-            // TOKEN IS INVALID. Try to refresh the token and try again. If that fails, call the unauthorizedCallAttempted callback to alert the app.
+            // TOKEN IS INVALID.
+            guard !isForRefresh else {
+                // If this is for refreshing the token, then don't try and call the refresh call again. At this point just fail the call
+                completion(.invalidCantRefresh)
+                return
+            }
+            
+            // Try to refresh the token and try again. If that fails, call the unauthorizedCallAttempted callback to alert the app.
             if retryCount <= JANetworkingConfiguration.sharedConfiguration.unauthorizedRetryLimit, let delegate = delegate {
                 delegate.updateToken(completion: {(success:Bool) in
                     if success {
