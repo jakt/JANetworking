@@ -270,7 +270,6 @@
 				TargetAttributes = {
 					CDD253CD1D2C16A5009E635F = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = 2PG2ASWQ43;
 						LastSwiftMigration = 0800;
 					};
 					CDD253D71D2C16A5009E635F = {
@@ -521,7 +520,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 2PG2ASWQ43;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -542,7 +541,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 2PG2ASWQ43;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
