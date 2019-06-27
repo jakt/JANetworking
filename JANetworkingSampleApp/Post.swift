@@ -31,7 +31,7 @@ public struct Post {
         let url = URL(string: JANetworkingConfiguration.baseURL + "/posts/")!
         return JANetworkingResource(method: .GET, url: url, headers: nil, params: nil, parseJSON: { json in
             guard let items = json as? [JSONDictionary] else { return nil }
-            let posts = items.flatMap(Post.init)
+            let posts = items.compactMap(Post.init)
             return posts
         })
     }

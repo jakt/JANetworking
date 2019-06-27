@@ -15,7 +15,7 @@ let tokenStatusNotificationName = NSNotification.Name.init("TokenStatusChanged")
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         // Do all setup for JANetworking. Set URLs, environment, and token storage here.
         JANetworkingConfiguration.setBaseURL(development: "https://www.devurl.com", staging: "https://www.stagingurl.com", production: "https://www.produrl.com")
